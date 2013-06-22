@@ -34,7 +34,12 @@ public:
     {
         
     }
-    
+    ofxUILabel(float x, float y, float w, float h, string _name, string _label, int _size) : ofxUIWidgetWithLabel()
+    {
+        rect = new ofxUIRectangle(x,y,w,h);
+        init(_name, _label, _size);
+        autoSize = true;
+    }
     ofxUILabel(float x, float y, string _name, string _label, int _size) : ofxUIWidgetWithLabel()
     {
         rect = new ofxUIRectangle(x,y,0,0); 
