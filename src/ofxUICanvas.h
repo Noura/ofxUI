@@ -2859,7 +2859,19 @@ public:
                 ofColor cpo = ofColor( 209, 231, 81, 200 );                
                 setUIColors( cb, co, coh, cf, cfh, cp, cpo );                                 
             }
-                break;  
+                break;
+            case OFX_UI_THEME_SCENEMAKER:
+            {
+                ofColor cb = ofColor( 158, 158, 158, 150);
+                ofColor co = OFX_UI_COLOR_OUTLINE;
+                ofColor coh = OFX_UI_COLOR_OUTLINE_HIGHLIGHT;
+                ofColor cf = OFX_UI_COLOR_FILL;
+                ofColor cfh = OFX_UI_COLOR_FILL_HIGHLIGHT;
+                ofColor cp = OFX_UI_COLOR_PADDED;
+                ofColor cpo = OFX_UI_COLOR_PADDED_OUTLINE;
+                setUIColors( cb, co, coh, cf, cfh, cp, cpo );
+            }
+                break;
                 
             default:
             {
