@@ -33,7 +33,7 @@ public:
         name = string("base");
         ID = -1;
         hit = false; 
-        visible = true; 
+        visible = true;
 #ifdef TARGET_OPENGLES
         touchId = -1; 
 #endif
@@ -217,7 +217,9 @@ public:
     
 	virtual void keyPressed(int key) {}
 	virtual void keyReleased(int key) {}
-	virtual void windowResized(int w, int h) {}           		
+	virtual void windowResized(int w, int h)
+    {   
+    }
     
 	virtual void setParent(ofxUIWidget *_parent)
 	{
@@ -418,6 +420,7 @@ public:
     {
         if(visible)
         {
+
             return rect->inside(x, y);
         }
         else
@@ -562,6 +565,7 @@ public:
     {
         embeddedWidgets.clear();        //does not deallocate widgets, just deletes the pointers and sets the size to zero
     }
+    //static float windowScale;
     
 protected:    
 	ofxUIWidget *parent; 
@@ -581,8 +585,8 @@ protected:
 	bool draw_outline; 
 	bool draw_outline_highlight; 
 	bool draw_fill; 
-	bool draw_fill_highlight; 
-
+	bool draw_fill_highlight;
+    
 	ofColor color_back; 
 	ofColor color_outline; 
 	ofColor color_outline_highlight;	
@@ -604,4 +608,5 @@ protected:
 #endif
 };
 
+//float ofxUIWidget::windowScale=1.0;
 #endif

@@ -524,7 +524,8 @@ protected:
     ofPoint vel; 
     ofPoint acc; 
     float damping;
-    float stickyDistance;     
+    float stickyDistance;
+    float windowScale;
 };
     
     

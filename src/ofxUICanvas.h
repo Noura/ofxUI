@@ -142,7 +142,7 @@ public:
 
 		GUIevent = new ofxUIEventArgs(this);
 		enabled = false;
-		enable();        
+		enable();
     }
     
     void copyCanvasStyle(ofxUICanvas *styler)
@@ -823,23 +823,27 @@ public:
 #else	
     
     void onMouseReleased(ofMouseEventArgs& data) 
-    { 
-        mouseReleased(data.x, data.y, data.button); 
+    {   int x = data.x/ofxUICanvasMouseScale;
+        int y = data.y/ofxUICanvasMouseScale;
+        mouseReleased(x, y, data.button);
     }
     
     void onMousePressed(ofMouseEventArgs& data) 
-    { 
-        mousePressed(data.x, data.y, data.button); 
+    {   int x = data.x/ofxUICanvasMouseScale;
+        int y = data.y/ofxUICanvasMouseScale;
+        mousePressed(x, y, data.button);
     }
     
     void onMouseMoved(ofMouseEventArgs& data) 
-    { 
-        mouseMoved(data.x, data.y); 
+    {   int x = data.x/ofxUICanvasMouseScale;
+        int y = data.y/ofxUICanvasMouseScale;
+        mouseMoved(x, y);
     }
     
     void onMouseDragged(ofMouseEventArgs& data) 
-    { 
-        mouseDragged(data.x, data.y, data.button); 
+    {   int x = data.x/ofxUICanvasMouseScale;
+        int y = data.y/ofxUICanvasMouseScale;
+        mouseDragged(x, y, data.button);
     }
 	
 	virtual void mouseMoved(int x, int y ) 
@@ -901,10 +905,19 @@ public:
     
     virtual void windowResized(int w, int h) 
     {
+        /*float windowHeight = 1080;
+        float windowWidth = 1920;
+        if ((double)ofGetWidth()/(double)ofGetHeight()>=16/9){
+            windowScale= ofGetHeight()/windowHeight;
+        }
+        else{ //TODO: figure initial window size out
+            windowScale= ofGetWidth()/windowWidth;
+        }
+        
 		for(int i = 0; i < widgets.size(); i++)
 		{
 			widgets[i]->windowResized(w, h); 
-		}
+		}*/
     }
     
 #endif	
@@ -3077,6 +3090,8 @@ public:
 	
 	ofEvent<ofxUIEventArgs> newGUIEvent;
 	
+    static float ofxUICanvasMouseScale;
+    
 protected:    
     
     void pushbackWidget(ofxUIWidget *widget, bool addWidgetToFront = false)
@@ -3119,7 +3134,6 @@ protected:
 	bool enabled; 
     int uniqueIDs; 
     bool hasKeyBoard; 
-    
     
     float widgetSpacing;
     float globalCanvasWidth;
@@ -3207,11 +3221,10 @@ protected:
                 {
                     hasKeyBoard = false; 
                 }
-                    break;                     
+                    break;
             }
         }        
     }
     
 };
-
 #endif
