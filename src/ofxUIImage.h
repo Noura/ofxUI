@@ -32,12 +32,14 @@ class ofxUIImage : public ofxUIWidgetWithLabel
 public:
     ofxUIImage(float x, float y, float w, float h, ofImage *_image, string _name) : ofxUIWidgetWithLabel()
     {
+        internalLoad = false;
         rect = new ofxUIRectangle(x,y,w,h); 
         init(w, h, _image, _name); 
     }
     
     ofxUIImage(float x, float y, float w, float h, ofImage *_image, string _name, bool _showLabel) : ofxUIWidgetWithLabel()
     {
+        internalLoad = false;
         rect = new ofxUIRectangle(x,y,w,h); 
         init(w, h, _image, _name); 
         showLabel = _showLabel; 
@@ -45,16 +47,34 @@ public:
     
     ofxUIImage(float w, float h, ofImage *_image, string _name) : ofxUIWidgetWithLabel()
     {
+        internalLoad = false;
         rect = new ofxUIRectangle(0,0,w,h); 
         init(w, h, _image, _name); 
     }    
 
     ofxUIImage(float w, float h, ofImage *_image, string _name, bool _showLabel) : ofxUIWidgetWithLabel()
     {
+        internalLoad = false;
         rect = new ofxUIRectangle(0,0,w,h); 
         init(w, h, _image, _name); 
         showLabel = _showLabel; 
-    }    
+    }
+    
+    ofxUIImage(float w, float h, string imagePath, bool useTexture, string _name, bool _showLabel) : ofxUIWidgetWithLabel()
+    {
+        internalLoad = true;
+        ofImage* _image = new ofImage();
+        _image->setUseTexture(useTexture);
+        _image->loadImage(imagePath);
+        rect = new ofxUIRectangle(0,0,w,h);
+        init(w, h, _image, _name);
+        showLabel = _showLabel;
+    }
+    
+    virtual ~ofxUIImage()
+    {
+        if(internalLoad) delete image;
+    }
     
     void init(float w, float h, ofImage *_image, string _name)
     {
@@ -65,7 +85,7 @@ public:
 		paddedRect->setParent(rect); 
         
         draw_back = false; 
-        draw_fill = true; 
+        draw_fill = true;
         
 		image = _image; 
         
@@ -73,7 +93,7 @@ public:
 		label->setParent(label); 
 		label->setRectParent(rect);    
         label->setEmbedded(true);
-        cropImageToFitRect = false; 
+        cropImageToFitRect = false;
     }
     
     virtual void setDrawPadding(bool _draw_padded_rect)
@@ -106,7 +126,8 @@ public:
                 }
 			}
         }
-    }        
+    }
+
 
     virtual void setVisible(bool _visible)
     {
@@ -152,7 +173,8 @@ public:
 protected:    //inherited: ofxUIRectangle *rect; ofxUIWidget *parent; 
 	ofImage *image;
     bool showLabel;
-    bool cropImageToFitRect; 
+    bool cropImageToFitRect;
+    bool internalLoad;
 }; 
 
 #endif
