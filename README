@@ -1,4 +1,4 @@
-Incorporated some changes for the WaaZam project (www.waazam.com)
+Incorporated some changes for the WaaZam project (www.waazam.com) -- Noura
 
 ofxUI is an addon for openFrameworks (version 073+) that easily allows for the creation of user interfaces aka GUIs. ofxUI also takes care of widget layout, spacing, font loading, saving and loading settings, and widget callbacks. ofxUI can be easily customized (colors, font & widget sizes, padding, layout, etc).
 
