@@ -25,6 +25,9 @@
 #ifndef OFXUI_RECTANGLE
 #define OFXUI_RECTANGLE
 
+#include "ofMain.h"
+#include "ofxUIOFWrapper.h"
+
 class ofxUIRectangle 
 {
 
