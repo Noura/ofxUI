@@ -24,7 +24,8 @@ public:
     float getCenterX();
     float getCenterY();
     
-    void setImage(string imagePath);
+    void setHeight(float _h);
+    void setImage(string _imagePath);
     
     void draw();
     
@@ -39,7 +40,9 @@ protected:
     bool hit;
     float mouseDx, mouseDy;
     ofxUIRectangle * bounds;
-    ofImage * image;
+    ofImage image;
+    string imagePath;
+
 };
 
 

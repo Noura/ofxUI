@@ -32,11 +32,6 @@ ofRectangle ofxUIScrollbarCanvas::getAvailableSpace() {
 }
 
 void ofxUIScrollbarCanvas::update() {
-    /*
-    ofxUIScrollableCanvas::update();
-    float scrollPercent = (scrollbar->getCenterY() - scrollTop) / (scrollBottom - scrollTop);
-    sRect->y = rect->y + (scrollPercent * (rect->getMaxY() - fabs(rect->height)));
-     */
 }
 
 void ofxUIScrollbarCanvas::draw() {

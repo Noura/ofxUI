@@ -14,7 +14,7 @@ ofxUIDraggableRect::ofxUIDraggableRect(float _x, float _y, float _w, float _h, o
 , hit(false)
 , mouseDx(0)
 , mouseDy(0)
-, image(NULL) {
+, imagePath("") {
     bounds = new ofxUIRectangle(_bounds.x, _bounds.y, _bounds.width, _bounds.height);
     ofAddListener(ofEvents().mousePressed, this, &ofxUIDraggableRect::onMousePressed);
     ofAddListener(ofEvents().mouseReleased, this, &ofxUIDraggableRect::onMouseReleased);
@@ -23,7 +23,6 @@ ofxUIDraggableRect::ofxUIDraggableRect(float _x, float _y, float _w, float _h, o
 
 ofxUIDraggableRect::~ofxUIDraggableRect() {
     delete bounds;
-    delete image;
     ofRemoveListener(ofEvents().mousePressed, this, &ofxUIDraggableRect::onMousePressed);
     ofRemoveListener(ofEvents().mouseReleased, this, &ofxUIDraggableRect::onMouseReleased);
     ofRemoveListener(ofEvents().mouseDragged, this, &ofxUIDraggableRect::onMouseDragged);
@@ -74,22 +73,25 @@ float ofxUIDraggableRect::getCenterY() {
     return getMinY() + height/2;
 }
 
-void ofxUIDraggableRect::setImage(string imagePath) {
+void ofxUIDraggableRect::setImage(string _imagePath) {
     // TODO it would probably be more efficient to take in a pointer to an ofImage in case multiple things wanted to share the same image. also ofxUI has some concept of shared resources which is probably for stuff like this.
-    image = new ofImage();
-    image->loadImage(imagePath);
-    //image->setImageType(OF_IMAGE_COLOR);
+    imagePath = _imagePath;
+    image.loadImage(imagePath);
+    image.resize(width, height);
 }
 
 void ofxUIDraggableRect::draw() {
     ofxUIRectangle::draw();
-    if (image) {
-        //glBegin(GL_POINTS);
-        //glColor3f(1.0, 1.0, 1.0);
-        image->draw(0, 0);
-        //glEnd();
-        //image->draw(x, y, width, height);
-        //image->drawSubsection(getX(), getY(), getWidth(), getHeight(), 0, 0);
+    if (imagePath != "") {
+        ofSetColor(255);
+        image.draw(x, y);
+    }
+}
+
+void ofxUIDraggableRect::setHeight(float _h) {
+    ofxUIRectangle::setHeight(_h);
+    if (imagePath != "") {
+        image.resize(width, height);
     }
 }
 
