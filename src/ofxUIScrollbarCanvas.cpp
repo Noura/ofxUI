@@ -65,15 +65,18 @@ void ofxUIScrollbarCanvas::mouseReleased(int x, int y, int button) {
 void ofxUIScrollbarCanvas::mouseDragged(int x, int y, int button) {
     if (scrollbar->isHit() && scrollBottom != scrollTop) {
         float scrollPercent = (scrollbar->getCenterY() - scrollTop) / (scrollBottom - scrollTop);
-        
-        rect->y = init_y - scrollPercent * contentHeight;
+        rect->y = init_y - scrollPercent * (contentHeight - init_h);
     } else {
         ofxUIScrollableCanvas::mouseDragged(x, y, button);
+        float scrollPercent = (init_y - rect->y) / (contentHeight - init_h);
+        scrollPercent = MAX(0.0, scrollPercent);
+        scrollPercent = MIN(1.0, scrollPercent);
+        float scrollbarY = init_y + scrollPercent * (init_h - scrollbar->height);
+        scrollbar->y = scrollbarY;
     }
 }
 
 void ofxUIScrollbarCanvas::setContentHeight(float _contentHeight) {
-    
     contentHeight = _contentHeight;
     scrollbar_h = MAX(OFX_UI_MIN_SCROLLBAR_H, MIN(init_h * init_h / contentHeight, init_h));
     
