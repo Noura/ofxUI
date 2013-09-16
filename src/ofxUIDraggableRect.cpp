@@ -78,14 +78,18 @@ void ofxUIDraggableRect::setImage(string imagePath) {
     // TODO it would probably be more efficient to take in a pointer to an ofImage in case multiple things wanted to share the same image. also ofxUI has some concept of shared resources which is probably for stuff like this.
     image = new ofImage();
     image->loadImage(imagePath);
-    
+    //image->setImageType(OF_IMAGE_COLOR);
 }
 
 void ofxUIDraggableRect::draw() {
     ofxUIRectangle::draw();
     if (image) {
-        image->drawSubsection(getX(), getY(), getWidth(), getHeight(), 0, 0);
-        
+        //glBegin(GL_POINTS);
+        //glColor3f(1.0, 1.0, 1.0);
+        image->draw(0, 0);
+        //glEnd();
+        //image->draw(x, y, width, height);
+        //image->drawSubsection(getX(), getY(), getWidth(), getHeight(), 0, 0);
     }
 }
 
