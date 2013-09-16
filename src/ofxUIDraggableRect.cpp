@@ -83,8 +83,10 @@ void ofxUIDraggableRect::setImage(string _imagePath) {
 void ofxUIDraggableRect::draw() {
     ofxUIRectangle::draw();
     if (imagePath != "") {
+        ofPushStyle();
         ofSetColor(255);
         image.draw(x, y);
+        ofPopStyle();
     }
 }
 
