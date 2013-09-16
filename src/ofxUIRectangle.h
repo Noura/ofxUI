@@ -183,7 +183,7 @@ public:
     
     void draw()
     {
-        if(parent != NULL)
+        if(parent)
         {
             ofxUIDrawRect(parent->getX()+x, parent->getY()+y, width, height); 
         }

@@ -11,15 +11,22 @@
 #define example_all_ofxUIDraggableRect_h
 
 #include "ofxUIRectangle.h"
+#include "ofMain.h"
 
 class ofxUIDraggableRect : public ofxUIRectangle {
 
 public:
     
-    ofxUIDraggableRect(float _x, float _y, float _w, float _h);
+    ofxUIDraggableRect(float _x, float _y, float _w, float _h, ofRectangle _bounds);
     ~ofxUIDraggableRect();
     
     bool isHit();
+    float getCenterX();
+    float getCenterY();
+    
+    void setImage(string imagePath);
+    
+    void draw();
     
     virtual void onMousePressed(ofMouseEventArgs &e);
     virtual void onMouseReleased(ofMouseEventArgs &e);
@@ -27,9 +34,12 @@ public:
     
 protected:
     
+    float bounded(float x, float min, float max);
+    
     bool hit;
     float mouseDx, mouseDy;
-    
+    ofxUIRectangle * bounds;
+    ofImage * image;
 };
 
 

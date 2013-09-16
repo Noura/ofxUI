@@ -117,7 +117,8 @@ enum ofxUIWidgetType
     OFX_UI_WIDGET_VALUEPLOTTER = 40,
     OFX_UI_WIDGET_2DGRAPH = 41,
     OFX_UI_WIDGET_SUPERCANVAS = 42,
-    OFX_UI_WIDGET_TABBAR = 43
+    OFX_UI_WIDGET_TABBAR = 43,
+    OFX_UI_WIDGET_SCROLLBARCANVAS = 44
 };
 
 enum ofxUIWidgetOrientation
@@ -275,5 +276,6 @@ enum ofxUIThemeType
 #include "ofxUISuperCanvas.h"
 #include "ofxUITabBar.h"
 #include "ofxUIDraggableRect.h"
+#include "ofxUIScrollbarCanvas.h"
 
 #endif

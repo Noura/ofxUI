@@ -217,7 +217,7 @@ public:
             
             if(scrollY && snapping)
             {
-                float dyTop = rect->y - sRect->y; 
+                float dyTop = rect->y - sRect->y;
                 float dyBot = (sRect->y+sRect->getHeight()) - (rect->y+rect->getHeight()); 
                 if(fabs(dyBot) < stickyDistance)
                 {
@@ -491,7 +491,7 @@ public:
     
 #endif
 
-    void mouseDragged(int x, int y, int button) 
+    virtual void mouseDragged(int x, int y, int button)
     {	
         for(vector<ofxUIWidget *>::iterator it = widgets.begin(); it != widgets.end(); ++it)
         {
@@ -520,7 +520,7 @@ public:
         }
     }
     
-    void mousePressed(int x, int y, int button) 
+    virtual void mousePressed(int x, int y, int button)
     {
         if(sRect->inside(x, y))
         {
@@ -545,7 +545,7 @@ public:
         vel.set(0,0);
     }
     
-    void mouseReleased(int x, int y, int button) 
+    virtual void mouseReleased(int x, int y, int button)
     {	
         for(vector<ofxUIWidget *>::iterator it = widgets.begin(); it != widgets.end(); ++it)
         {

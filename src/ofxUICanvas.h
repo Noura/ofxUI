@@ -3151,7 +3151,7 @@ public:
 		}	 
         return widgetToReturn;                                         
     }
-	
+    
 	ofEvent<ofxUIEventArgs> newGUIEvent;
 	
 protected:    
