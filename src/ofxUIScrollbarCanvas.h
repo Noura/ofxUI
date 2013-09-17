@@ -10,8 +10,8 @@
 #ifndef example_all_ofxUIScrollbarCanvas_h
 #define example_all_ofxUIScrollbarCanvas_h
 
-#define OFX_UI_MIN_SCROLLBAR_H 15
-#define OFX_UI_MIN_SCROLLBAR_W 10
+#define OFX_UI_MIN_SCROLLBAR_H 25
+#define OFX_UI_MIN_SCROLLBAR_W 15
 
 #include "ofMain.h"
 #include "ofxUI.h"
