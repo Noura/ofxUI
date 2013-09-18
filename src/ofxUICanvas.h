@@ -564,7 +564,7 @@ public:
     }
      
     virtual void draw()
-    {		
+    {
         ofxUIPushStyle();
 		
         glDisable(GL_DEPTH_TEST);

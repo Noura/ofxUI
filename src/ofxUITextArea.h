@@ -35,19 +35,19 @@ public:
         init(_name, _textstring, w, h, x, y, _size);
     }
     
-    void init(string _name, string _textstring, float w, float h = 0, float x = 0, float y = 0, int _size = OFX_UI_FONT_MEDIUM)
+    void init(string _name, string _textstring, float w, float h, float x, float y, int _size)
     {
-        rect = new ofxUIRectangle(x,y,w,h);
+        paddedRect = new ofxUIRectangle(x, y, w, h);
+        rect = new ofxUIRectangle(x + padding, y + padding, w - 2.0*padding, h - 2.0*padding);
+        paddedRect->setParent(rect);
 		name = string(_name); 
 		kind = OFX_UI_WIDGET_TEXTAREA;
-		textstring = _textstring;        
+		textstring = _textstring;
         setDrawFill(true);
         setDrawBack(false);
         drawShadow = false; 
-		paddedRect = new ofxUIRectangle(-padding, -padding, w+padding*2.0, padding*2.0);
-		paddedRect->setParent(rect);
         		
-		label = new ofxUILabel(padding*2.0,0,(name+" LABEL"), _size);
+		label = new ofxUILabel(x+padding,y+padding,(name+" LABEL"), _size);
 		label->setParent(label);
 		label->setRectParent(rect);
         label->setEmbedded(true);
@@ -74,6 +74,7 @@ public:
     
     virtual void drawFill()
     {
+        
         if(draw_fill)
         {
             if(drawShadow)
@@ -92,7 +93,12 @@ public:
             }
         }
     }
-		
+    
+    void draw() {
+        
+        ofxUIWidget::draw();
+    }
+    
     void setVisible(bool _visible)
     {
         visible = _visible;
@@ -113,13 +119,49 @@ public:
 	}
     
     void formatTextString()
-    {
-        float rectWidthLimit = rect->getWidth()-padding*6;
-        float rectHeightLimit = rect->getHeight()-label->getLineHeight()-padding;
-        bool overheight = false;
+    {        
+        textLines.clear();
         
-        lineHeight = label->getStringHeight("1");
-        lineSpaceSize = padding*2;
+        lineHeight = label->getLineHeight();
+        lineSpaceSize = lineHeight * 0.5;
+        
+        float widthLimit = rect->getWidth() - label->getStringWidth("M");
+        float heightLimit = rect->getHeight();
+        
+        int numLinesLimit;
+        if (autoSize) {
+            numLinesLimit = 0;
+        } else {
+            numLinesLimit = (int)heightLimit / (lineHeight + lineSpaceSize);
+        }
+        
+        string line = "";
+        for (int i = 0; i < textstring.size(); i++) {
+            if (!autoSize && textLines.size() > numLinesLimit) {
+                break;
+            }
+            if (label->getStringWidth(line) >= widthLimit) {
+                textLines.push_back(line);
+                line = "";
+            }
+            char c = textstring.at(i);
+            line += c;
+        }
+        if (line != "" && !(!autoSize && textLines.size() > numLinesLimit)) {
+            textLines.push_back(line);
+        }
+        
+        if (autoSize) {
+            rect->setHeight(textLines.size() * (lineHeight + lineSpaceSize));
+            paddedRect->setHeight(rect->getHeight() + 2.0*padding);
+        }
+        
+
+        
+        /*
+        float rectWidthLimit = rect->getWidth();
+        float rectHeightLimit = rect->getHeight();
+        bool overheight = false;
         
         offsetY = floor(padding*.125);
         
@@ -134,7 +176,6 @@ public:
         {        
             float tempWidth;
             float tempHeight;
-            textLines.clear();
             string line = "";
             size_t i=0;                    
             
@@ -193,15 +234,13 @@ public:
         if(overheight)
         {
             rect->setHeight(MAX(rect->getHeight(),(lineHeight+lineSpaceSize)*textLines.size()-lineSpaceSize));
-        }
+        }*/
     }
 
 	void setParent(ofxUIWidget *_parent)
 	{
 		parent = _parent;
         formatTextString();
-        label->setVisible(false);
-		paddedRect->height = rect->height+padding*2.0;
 	}
     
     void setDrawShadow(bool _drawShadow)
