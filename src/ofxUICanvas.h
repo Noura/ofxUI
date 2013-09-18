@@ -3153,6 +3153,16 @@ public:
     }
     
 	ofEvent<ofxUIEventArgs> newGUIEvent;
+    
+    ofxUIFont * getFont(int type) {
+        if (type == OFX_UI_FONT_SMALL) {
+            return font_small;
+        } else if (type == OFX_UI_FONT_MEDIUM) {
+            return font_medium;
+        } else if (type == OFX_UI_FONT_LARGE) {
+            return font_large;
+        }
+    }
 	
 protected:    
     
