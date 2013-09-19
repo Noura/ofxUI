@@ -126,6 +126,9 @@ public:
         lineSpaceSize = lineHeight * 0.5;
         
         float widthLimit = rect->getWidth() - label->getStringWidth("M");
+        if (widthLimit < label->getStringWidth("M")) {
+            return;
+        }
         float heightLimit = rect->getHeight();
         
         int numLinesLimit;
@@ -135,14 +138,32 @@ public:
             numLinesLimit = (int)heightLimit / (lineHeight + lineSpaceSize);
         }
         
+        
         string line = "";
         for (int i = 0; i < textstring.size(); i++) {
+            
             if (!autoSize && textLines.size() > numLinesLimit) {
                 break;
             }
             if (label->getStringWidth(line) >= widthLimit) {
-                textLines.push_back(line);
-                line = "";
+                if (line.size() == 0) {
+                    break;
+                }
+                // try to break line at white space
+                int whitespace_index = line.size() - 1;
+                while (whitespace_index > 0 &&
+                       !isspace(line.at(whitespace_index))) {
+                    whitespace_index--;
+                }
+                if (whitespace_index <= 0) {
+                    // white space not found, or found at first char
+                    textLines.push_back(line.substr(0, line.size()-1));
+                    line = line.substr(line.size()-1);
+                } else {
+                    // white space found
+                    textLines.push_back(line.substr(0, whitespace_index));
+                    line = line.substr(whitespace_index);
+                }
             }
             char c = textstring.at(i);
             line += c;
@@ -155,87 +176,7 @@ public:
             rect->setHeight(textLines.size() * (lineHeight + lineSpaceSize));
             paddedRect->setHeight(rect->getHeight() + 2.0*padding);
         }
-        
-
-        
-        /*
-        float rectWidthLimit = rect->getWidth();
-        float rectHeightLimit = rect->getHeight();
-        bool overheight = false;
-        
-        offsetY = floor(padding*.125);
-        
-        if(label->getStringWidth(textstring) <= rectWidthLimit)
-        {
-            if(textstring.size() > 0)
-            {
-                textLines.push_back(textstring);
-            }
-        }
-        else
-        {        
-            float tempWidth;
-            float tempHeight;
-            string line = "";
-            size_t i=0;                    
-            
-            while (i < textstring.size() && !overheight) //if not at the end of the string && not over the rect's height
-            {
-                tempWidth = label->getStringWidth(line);
-                if(tempWidth < rectWidthLimit)
-                {
-                    line+=textstring.at(i);
-                    i++;
-                    if(i == textstring.size())
-                    {
-                        textLines.push_back(line);
-                    }
-                }
-                else
-                {
-                    bool notFound = true;
-                    
-                    while (notFound && !overheight)
-                    {
-                        if(strncmp(&textstring.at(i), " ",1) == 0)
-                        {
-                            tempHeight = (textLines.size()+1)*(lineHeight+lineSpaceSize);
-    //                        cout << tempHeight << endl;
-    //                        cout << rectHeightLimit << endl;
-                            if(!autoSize && tempHeight >= rectHeightLimit)
-                            {
-                                textLines.push_back(line);
-                                textLines[textLines.size()-1]+="...";
-                                overheight = true;
-                            }
-                            notFound = false; 
-                            if(!overheight)
-                            {
-                                textLines.push_back(line);
-                                line.clear();
-                                i++; 
-                            }
-                        }
-                        else 
-                        {
-                            i--; 											
-                            line.erase(line.end()-1); 
-                        }					
-                    }
-                }		
-            }
-        }
-        
-        if(autoSize)
-        {
-            rect->setHeight((lineHeight+lineSpaceSize)*textLines.size()-lineSpaceSize);
-        }
-        
-        if(overheight)
-        {
-            rect->setHeight(MAX(rect->getHeight(),(lineHeight+lineSpaceSize)*textLines.size()-lineSpaceSize));
-        }*/
-    }
+     }
 
 	void setParent(ofxUIWidget *_parent)
 	{
