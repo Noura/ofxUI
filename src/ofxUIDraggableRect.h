@@ -22,7 +22,7 @@ public:
     , hit(false)
     , mouseDx(0)
     , mouseDy(0)
-    , imagePath("") {
+    , image(NULL) {
         bounds = new ofxUIRectangle(_bounds.x, _bounds.y, _bounds.width, _bounds.height);
         ofAddListener(ofEvents().mousePressed, this, &ofxUIDraggableRect::onMousePressed);
         ofAddListener(ofEvents().mouseReleased, this, &ofxUIDraggableRect::onMouseReleased);
@@ -31,6 +31,7 @@ public:
     
     ~ofxUIDraggableRect() {
         delete bounds;
+        delete image;
         ofRemoveListener(ofEvents().mousePressed, this, &ofxUIDraggableRect::onMousePressed);
         ofRemoveListener(ofEvents().mouseReleased, this, &ofxUIDraggableRect::onMouseReleased);
         ofRemoveListener(ofEvents().mouseDragged, this, &ofxUIDraggableRect::onMouseDragged);
@@ -50,23 +51,24 @@ public:
     
     void setHeight(float _h) {
         ofxUIRectangle::setHeight(_h);
-        if (imagePath != "") {
-            image.resize(width, height);
+        if (image) {
+            image->resize(width, height);
         }
     }
     
     void setImage(string _imagePath) {
-        imagePath = _imagePath;
-        image.loadImage(imagePath);
-        image.resize(width, height);
+        delete image;
+        image = new ofImage();
+        image->loadImage(_imagePath);
+        image->resize(width, height);
     }
     
     void draw() {
         ofxUIRectangle::draw();
-        if (imagePath != "") {
+        if (image) {
             ofPushStyle();
             ofSetColor(255);
-            image.draw(x, y);
+            image->draw(x, y);
             ofPopStyle();
         }
     }
@@ -109,8 +111,7 @@ protected:
     bool hit;
     float mouseDx, mouseDy;
     ofxUIRectangle * bounds;
-    ofImage image;
-    string imagePath;
+    ofImage * image;
 
 };
 

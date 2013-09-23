@@ -59,6 +59,15 @@ public:
         scrollBottom = init_y + init_h - scrollbar->height/2;
     }
     
+    // This will re-flow the content to fill gaps left by removed widgets
+    void reflowWidgets(vector<ofxUIWidget*> ws, float h, float y0) {
+        float y = y0;
+        for (vector<ofxUIWidget*>::iterator it = ws.begin(); it < ws.end(); it++) {
+            (*it)->getRect()->setY(y);
+            y += h;
+        }
+    }
+    
     // optionally use an image as the scrollbar
     void setScrollbarImage(string imagePath) {
         scrollbar->setImage(imagePath);
