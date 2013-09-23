@@ -122,7 +122,7 @@ public:
     {        
         textLines.clear();
         
-        lineHeight = label->getLineHeight();
+        lineHeight = label->getLineHeight() * 1.5;
         lineSpaceSize = lineHeight * 0.5;
         
         float widthLimit = rect->getWidth() - label->getStringWidth("M");
