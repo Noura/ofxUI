@@ -74,7 +74,6 @@ public:
     
     virtual void drawFill()
     {
-        
         if(draw_fill)
         {
             if(drawShadow)
@@ -95,7 +94,6 @@ public:
     }
     
     void draw() {
-        
         ofxUIWidget::draw();
     }
     
