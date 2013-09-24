@@ -52,15 +52,17 @@ public:
     
     void init(string _name, string _textstring, float w, float h = 0, float x = 0, float y = 0, int _size = OFX_UI_FONT_SMALL)
     {
-        rect = new ofxUIRectangle(x,y,w,h); 
+        // TODO why won't ofxUI things show up in their own canvas even when I make the paddedRect the same dimensions as the ofxUICanvas -- where is this extra margin_guess coming from?
+        float margin_guess = 2;
+        paddedRect = new ofxUIRectangle(x + margin_guess, y + margin_guess, w - margin_guess * 2.0, h - margin_guess * 2.0);
+        rect = new ofxUIRectangle(x + padding + margin_guess, y + padding + margin_guess, w - 2.0*padding - 2.0*margin_guess, h - 2.0*padding - 2.0*margin_guess);
+        paddedRect->setParent(rect);
+
 		name = string(_name);  		
 		kind = OFX_UI_WIDGET_TEXTINPUT; 		
 		textstring = _textstring; 
 		defaultstring = _textstring;
 		displaystring = _textstring;
-        
-		paddedRect = new ofxUIRectangle(-padding, -padding, w+padding*2.0, padding*2.0);
-		paddedRect->setParent(rect); 
         
 		clicked = false;                                            //the widget's value
         autoclear = true;
