@@ -26,8 +26,9 @@
 #define OFXUI_TEXT_INPUT
 
 #include "ofxUIWidgetWithLabel.h"
+#include "ofxUITextArea.h"
 
-class ofxUITextInput : public ofxUIWidgetWithLabel
+class ofxUITextInput : public ofxUIWidget
 {
 public:
     ofxUITextInput(string _name, string _textstring, float w, float h = 0, float x = 0, float y = 0, int _size = OFX_UI_FONT_SMALL) : ofxUIWidgetWithLabel()
@@ -54,44 +55,83 @@ public:
     {
         // TODO why won't ofxUI things show up in their own canvas even when I make the paddedRect the same dimensions as the ofxUICanvas -- where is this extra margin_guess coming from?
         float margin_guess = 2;
-        paddedRect = new ofxUIRectangle(x + margin_guess, y + margin_guess, w - margin_guess * 2.0, h - margin_guess * 2.0);
-        rect = new ofxUIRectangle(x + padding + margin_guess, y + padding + margin_guess, w - 2.0*padding - 2.0*margin_guess, h - 2.0*padding - 2.0*margin_guess);
+        paddedRect = new ofxUIRectangle(x + margin_guess, y + margin_guess, w - 2.0 * margin_guess, h - 2.0 * margin_guess);
+        rect = new ofxUIRectangle(x + padding + margin_guess, y + padding + margin_guess, w - 2.0 * padding - 2.0 * margin_guess, h - 2.0 * padding - 2.0 * margin_guess);
         paddedRect->setParent(rect);
 
 		name = string(_name);  		
-		kind = OFX_UI_WIDGET_TEXTINPUT; 		
-		textstring = _textstring; 
-		defaultstring = _textstring;
-		displaystring = _textstring;
+		kind = OFX_UI_WIDGET_TEXTINPUT;
+
+		defaultstring = _textstring;;
+        textArea = new ofxUITextArea(_name, _textstring, w, h, x, y, _size);
         
-		clicked = false;                                            //the widget's value
+		clicked = false;
         autoclear = true;
         triggerOnClick = true;
-		
-		label = new ofxUILabel(padding*2.0,0,(name+" LABEL"), _size); 
-		label->setParent(label); 
-		label->setRectParent(rect); 
-        label->setEmbedded(true);
-        
 		triggerType = OFX_UI_TEXTINPUT_ON_FOCUS;
-		cursorWidth = 0; spaceOffset = 0; 		
+
+		cursorWidth = 1.0;
+        cursorOffset = 2.0;
 		theta = 0;
 
-        cursorPosition = 0;
-        firstVisibleCharacterIndex = 0;
+        cursorChar = 0;
     }
     
     virtual void setDrawPadding(bool _draw_padded_rect)
 	{
 		draw_padded_rect = _draw_padded_rect; 
-        label->setDrawPadding(false);
+        textArea->setDrawPadding(false);
 	}
     
     virtual void setDrawPaddingOutline(bool _draw_padded_rect_outline)
 	{
 		draw_padded_rect_outline = _draw_padded_rect_outline; 
-        label->setDrawPaddingOutline(false);
+        textArea->setDrawPaddingOutline(false);
 	}  
+    
+    void boundCursorChar() {
+        cursorChar = MIN(cursorChar, textArea->textstring.size());
+        cursorChar = MAX(0, cursorChar);
+    }
+    
+    virtual void setCursorChar(charIndex, lineIndex) {
+        
+    }
+    
+    virtual void getCharLineIndices() {
+        boundCursorChar();
+        int charIndex = 0;
+        int lineIndex = 0;
+        int i = 0;
+        while (i < cursorChar) {
+            i++;
+            if (charIndex <= textArea->textLines[lineIndex].size()) {
+                charIndex++;
+            } else {
+                lineIndex++;
+                charIndex = 0;
+            }
+        }
+        ofVec2f res(charIndex, lineIndex);
+        return res;
+    }
+
+    virtual void drawCursor() {
+        ofVec2f char_and_line = getCharLineIndices();
+        float char_index = char_and_line[0];
+        float line_index = char_and_line[1];
+        
+        string beforeCursor = textArea->textLines[line_index].substr(0, char_index);
+        
+        float x = textArea->rect->getX() + textArea->getLabelWidget()->getStringWidth(beforeCursor);
+        float y = textArea->getLineTopY(line_index);
+        
+        // cursor color oscillates
+        ofxUIFill();
+        ofxUISetColor(label->getColorFillHighlight(), 255.0*fabs(cos(theta)));
+        theta +=0.05;
+        ofxUIDrawRect(x, y, cursorWidth, textArea->lineHeight);
+    }
     
     virtual void drawFill() 
     {
@@ -101,36 +141,19 @@ public:
             ofxUISetColor(color_fill); 
             rect->draw(); 
         }
+        textArea->drawFill();
         if(clicked)
 		{
             ofNoFill();
             ofxUISetColor(color_outline_highlight);
             rect->draw();
-            
-			float h = label->getRect()->height; 
-			
-			float ph = rect->getHeight(); 
-			label->getRect()->y = ph/2.0 - h/2.0; 
-			
-            ofxUIFill(); 
-			ofxUISetColor(label->getColorFillHighlight(), 255.0*fabs(cos(theta))); 
-			theta +=0.05; 
-			
-            int displayCursorPosition = cursorPosition - firstVisibleCharacterIndex;
-            string displayStringBeforeCursor = displaystring.substr(0, displayCursorPosition);
-			spaceOffset = label->getStringWidth(displayStringBeforeCursor);
-
-			float x = label->getRect()->getX()+spaceOffset;			
-			float y = label->getRect()->getY()-padding; 
-			float t = label->getRect()->height+padding*2.0; 			
-			ofxUIDrawRect(x, y, cursorWidth, t); 
+			drawCursor();
 		}
-		
-		if(textstring.size() == 0 && !clicked)
+		if(textArea->textstring == "" && !clicked)
 		{
 			ofxUIFill(); 
-            ofxUISetColor(color_fill); 
-			label->drawString(rect->getX()+defaultX, rect->getY()+defaultY, defaultstring); 
+            ofxUISetColor(color_fill);
+            textArea->getLabelWidget()->drawString(textArea->rect->getX(), textArea->getLineBottomY(0), defaultstring);
 		}        
     }
 	
@@ -175,7 +198,8 @@ public:
 			theta = 0;
 			hit = true;
 #endif
-            cursorPosition = label->getLabel().length();
+
+            cursorChar = textArea->textstring.size();
             
             state = OFX_UI_STATE_DOWN;     
 			triggerType = OFX_UI_TEXTINPUT_ON_FOCUS;
@@ -223,55 +247,48 @@ public:
             switch (key) 
 			{
 				case OF_KEY_BACKSPACE:
-					if (textstring.size() > 0 && cursorPosition > 0)
-					{
-                        cursorPosition --;
-                        textstring.erase(cursorPosition, 1);
-                        
-                        // when we're deleting the first visible character, shift the string to the right
-                        if(firstVisibleCharacterIndex == cursorPosition)
-                            firstVisibleCharacterIndex = 0;
-                        recalculateDisplayString();
+					if (textstring.size() > 0 && cursorChar > 0) {
+                        cursorChar--;
+                        textArea->textstring.erase(cursorPosition, 1);
+                        textArea->formatDisplayString();
 					}
 					break;
 
                 case OF_KEY_DEL:
-					if (textstring.size() > 0 && cursorPosition < textstring.length())
-					{
-                        textstring.erase(cursorPosition, 1);
-                        recalculateDisplayString();
-					}
+					if (textstring.size() > 0 && cursorChar < textstring.length()) {
+                        textArea->textstring.erase(cursorPosition, 1);
+                        textArea->formatDisplayString();
+                    }
 					break;
 					
 				case OF_KEY_RETURN:
-
                     triggerType = OFX_UI_TEXTINPUT_ON_ENTER;
 					triggerEvent(this);
 					if(autoclear)
 					{
-						textstring.clear(); 
-                        recalculateDisplayString();
+						textArea->textstring.clear();
+                        textArea->formatDisplayString();
 					}
                     clicked = false;
 					break;
 					
 				case OF_KEY_RIGHT:
-                case OF_KEY_DOWN:
-                    if(cursorPosition < textstring.length())
+                    if(cursorChar < textArea->textstring.length())
                     {
-                        cursorPosition ++;
-                        recalculateDisplayString();
+                        cursorChar++;
+                        textArea->formatDisplayString();
                     }
 					break;					
-                    
-				case OF_KEY_LEFT:
-                case OF_KEY_UP:
-                    if(cursorPosition > 0)
+                    :
+                case OF_KEY_LEFT:
+                    if(cursorChar > 0)
                     {
-                        cursorPosition --;
-                        recalculateDisplayString();
+                        cursorChar--;
+                        textArea->formatDisplayString();
                     }
 					break;
+                    
+                case OF_KEY_DOWN:
 
 #if (OF_VERSION_MINOR > 7)
                 case OF_KEY_TAB:
@@ -499,22 +516,20 @@ public:
     }
 
     
-protected:    //inherited: ofxUIRectangle *rect; ofxUIWidget *parent;
-	string textstring; 
+protected:
+    // text
+    ofxUITextArea * textArea;
 	string defaultstring; 
-    string displaystring; 
-	bool clicked; 
-	float theta; 
-	float cursorWidth; 
-	float spaceOffset;		
-	bool autoclear; 
-	float defaultY, defaultX; 	
-	int triggerType;
-    int maxsize;
-    bool triggerOnClick;
+
+    // state and events
+	bool clicked, autoclear, triggerOnClick;
+    int triggerType;
     
-    unsigned int cursorPosition;
-    unsigned int firstVisibleCharacterIndex;
+    // drawing the cursor
+	float theta, cursorWidth, cursorOffset;
+    int cursorChar; // the char index in textArea->textstring immediately after
+                    // which to draw the cursor
+
 }; 
 
 #endif

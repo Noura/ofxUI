@@ -82,16 +82,23 @@ public:
                 ofSetColor(color_back);
                 for(unsigned int i = 0; i < textLines.size(); i++)
                 {
-                    label->drawStringShadow(rect->getX(), rect->getY()+(lineHeight+lineSpaceSize)*(i+1)-lineSpaceSize, textLines[i]);
+                    label->drawStringShadow(rect->getX(), getLineBottomY(i), textLines[i]);
                 }
             }
             
             ofSetColor(color_fill);
             for(unsigned int i = 0; i < textLines.size(); i++)
             {
-                label->drawString(rect->getX(), rect->getY()+(lineHeight+lineSpaceSize)*(i+1)-lineSpaceSize, textLines[i]);
+                label->drawString(rect->getX(), getLineBottomY(i), textLines[i]);
             }
         }
+    }
+    
+    float getLineBottomY(int line_index) {
+        return rect->getY() + (line_index + 1) * (lineHeight + lineSpaceSize) - lineSpaceSize;
+    }
+    float getLineTopY(int line_index) {
+        return rect->getY() + line_index * lineHeight + MAX(line_index-1, 0) * lineSpaceSize;
     }
     
     void draw() {
@@ -115,10 +122,10 @@ public:
 	{
         textLines.clear();        
         textstring = s;
-        formatTextString();
+        formatDisplayString();
 	}
     
-    void formatTextString()
+    void formatDisplayString()
     {        
         textLines.clear();
         
@@ -181,7 +188,7 @@ public:
 	void setParent(ofxUIWidget *_parent)
 	{
 		parent = _parent;
-        formatTextString();
+        formatDisplayString();
 	}
     
     void setDrawShadow(bool _drawShadow)
@@ -189,7 +196,6 @@ public:
         drawShadow = _drawShadow;
     }
 	
-protected:    //inherited: ofxUIRectangle *rect; ofxUIWidget *parent;
 	string textstring;
     vector<string> textLines;
     bool autoSize;
