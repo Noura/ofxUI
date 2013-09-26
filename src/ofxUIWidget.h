@@ -30,6 +30,7 @@ class ofxUIWidget
 public:
     ofxUIWidget() 
     {
+        
         parent = NULL; 
         name = string("base");
         ID = -1;

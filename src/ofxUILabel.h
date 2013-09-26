@@ -105,7 +105,9 @@ public:
 		label = string(_label);
 		size = _size;		
 
-		font = NULL;                 
+		font = new ofxUIFont();
+        
+        font->loadFont(OFX_UI_FONT_NAME, _size);
         draw_back = OFX_UI_LABEL_DRAW_BACK; 
         draw_fill = true; 
 		paddedRect = new ofxUIRectangle(-padding, -padding, padding*2.0, padding*2.0);
@@ -234,6 +236,7 @@ public:
 	
 	void setFont(ofxUIFont *_font)
 	{
+        delete font;
 		font = _font; 
 		setLabel(label); 
 	}

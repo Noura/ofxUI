@@ -142,7 +142,7 @@ public:
         
         widgetPosition = OFX_UI_WIDGET_POSITION_DOWN;
         widgetAlign = OFX_UI_ALIGN_LEFT;
-        widgetFontSize = OFX_UI_FONT_MEDIUM;
+        widgetFontSize = OFX_UI_FONT_MEDIUM_SIZE;
         
 		GUIevent = new ofxUIEventArgs(this);
 		enabled = false;
@@ -1428,21 +1428,21 @@ public:
         return widget;
     }
     
-    ofxUILabel *addLabel(string name, int size = OFX_UI_FONT_MEDIUM)
+    ofxUILabel *addLabel(string name, int size = OFX_UI_FONT_MEDIUM_SIZE)
     {
         ofxUILabel* widget = new ofxUILabel(name, size);
         addWidgetPosition(widget, widgetPosition, widgetAlign);
         return widget;
     }
 
-    ofxUILabel *addLabel(string name, string label, int size = OFX_UI_FONT_MEDIUM)
+    ofxUILabel *addLabel(string name, string label, int size = OFX_UI_FONT_MEDIUM_SIZE)
     {
         ofxUILabel* widget = new ofxUILabel(name, label, size);
         addWidgetPosition(widget, widgetPosition, widgetAlign);
         return widget;
     }
     
-    ofxUIFPS *addFPS(int size = OFX_UI_FONT_MEDIUM)
+    ofxUIFPS *addFPS(int size = OFX_UI_FONT_MEDIUM_SIZE)
     {
         ofxUIFPS* widget = new ofxUIFPS(size);
         addWidgetPosition(widget, widgetPosition, widgetAlign);
@@ -2142,7 +2142,7 @@ public:
     }
     //
     
-    ofxUITextArea* addTextArea(string _name, string _textstring, int _size = OFX_UI_FONT_MEDIUM)
+    ofxUITextArea* addTextArea(string _name, string _textstring, int _size = OFX_UI_FONT_MEDIUM_SIZE)
     {
         ofxUITextArea *widget = new ofxUITextArea(_name, _textstring, rect->getWidth()-widgetSpacing*2, 0, 0, 0, _size);
         addWidgetPosition(widget, widgetPosition, widgetAlign);
@@ -2163,13 +2163,13 @@ public:
 	{
 		switch(label->getSize())
 		{
-			case OFX_UI_FONT_LARGE:
+			case OFX_UI_FONT_LARGE_SIZE:
 				label->setFont(font_large); 					
 				break; 
-			case OFX_UI_FONT_MEDIUM:
+			case OFX_UI_FONT_MEDIUM_SIZE:
 				label->setFont(font_medium); 					
 				break; 
-			case OFX_UI_FONT_SMALL:
+			case OFX_UI_FONT_SMALL_SIZE:
 				label->setFont(font_small); 					
 				break; 					
 		}		
@@ -2262,7 +2262,7 @@ public:
         }
 	}
 	
-    void setWidgetFontSize(ofxUIWidgetFontType _widgetFontSize)
+    void setWidgetFontSize(int _widgetFontSize)
     {
         widgetFontSize = _widgetFontSize;
     }
@@ -2272,7 +2272,7 @@ public:
         return widgetPosition;
     }
     
-    ofxUIWidgetFontType getWidgetFontSize()
+    int getWidgetFontSize()
     {
         return widgetFontSize; 
     }
@@ -3220,7 +3220,7 @@ protected:
 
     ofxUIWidgetPosition widgetPosition;
     ofxUIWidgetAlignment widgetAlign;
-    ofxUIWidgetFontType widgetFontSize;
+    int widgetFontSize; // OFX_UI_FONT_* is the type of font as an enum, and OFX_UI_FONT_*_SIZE is the font size as an int
     
 	ofxUIColor widget_color_back;
 	ofxUIColor widget_color_outline;

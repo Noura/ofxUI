@@ -30,7 +30,7 @@
 class ofxUITextArea : public ofxUIWidgetWithLabel
 {
 public:
-    ofxUITextArea(string _name, string _textstring, float w, float h = 0, float x = 0, float y = 0, int _size = OFX_UI_FONT_MEDIUM) : ofxUIWidgetWithLabel()
+    ofxUITextArea(string _name, string _textstring, float w, float h = 0, float x = 0, float y = 0, int _size = OFX_UI_FONT_MEDIUM_SIZE) : ofxUIWidgetWithLabel()
     {
         init(_name, _textstring, w, h, x, y, _size);
     }

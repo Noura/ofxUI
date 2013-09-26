@@ -31,7 +31,7 @@
 class ofxUITextInput : public ofxUIWidget
 {
 public:
-    ofxUITextInput(string _name, string _textstring, float w, float h = 0, float x = 0, float y = 0, int _size = OFX_UI_FONT_SMALL) : ofxUIWidgetWithLabel()
+    ofxUITextInput(string _name, string _textstring, float w, float h = 0, float x = 0, float y = 0, int _size = OFX_UI_FONT_SMALL) : ofxUIWidget()
     {
         init(_name, _textstring, w, h, x, y, _size);
     }
@@ -39,13 +39,13 @@ public:
     // DON'T USE THE NEXT CONSTRUCTORS
     // This is maintained for backward compatibility and will be removed on future releases
     
-    ofxUITextInput(float x, float y, float w, string _name, string _textstring, int _size, float h = 0) : ofxUIWidgetWithLabel() 
+    ofxUITextInput(float x, float y, float w, string _name, string _textstring, int _size, float h = 0) : ofxUIWidget() 
     {
         init(_name, _textstring, w, h, x, y, _size);
 //        ofLogWarning("OFXUITEXTINPUT: DON'T USE THIS CONSTRUCTOR. THIS WILL BE REMOVED ON FUTURE RELEASES.");
     }
     
-    ofxUITextInput(float w, string _name, string _textstring, int _size, float h = 0) : ofxUIWidgetWithLabel()
+    ofxUITextInput(float w, string _name, string _textstring, int _size, float h = 0) : ofxUIWidget()
     {
         init(_name, _textstring, w, h, 0, 0, _size);
 //        ofLogWarning("OFXUITEXTINPUT: DON'T USE THIS CONSTRUCTOR. THIS WILL BE REMOVED ON FUTURE RELEASES.");
@@ -68,9 +68,10 @@ public:
 		clicked = false;
         autoclear = true;
         triggerOnClick = true;
+        
 		triggerType = OFX_UI_TEXTINPUT_ON_FOCUS;
 
-		cursorWidth = 1.0;
+		cursorWidth = textArea->getLabelWidget()->getStringWidth(".");
         cursorOffset = 2.0;
 		theta = 0;
 
@@ -94,11 +95,17 @@ public:
         cursorChar = MAX(0, cursorChar);
     }
     
-    virtual void setCursorChar(charIndex, lineIndex) {
-        
+    virtual void setCursorChar(int charIndex, int lineIndex) {
+        int i = 0;
+        int currentLineIndex = 0;
+        while (currentLineIndex < lineIndex) {
+            i += textArea->textLines[currentLineIndex++].size();
+        }
+        i += charIndex;
+        cursorChar = i;
     }
     
-    virtual void getCharLineIndices() {
+    virtual ofVec2f getCharLineIndices() {
         boundCursorChar();
         int charIndex = 0;
         int lineIndex = 0;
@@ -117,18 +124,22 @@ public:
     }
 
     virtual void drawCursor() {
+        
         ofVec2f char_and_line = getCharLineIndices();
         float char_index = char_and_line[0];
         float line_index = char_and_line[1];
         
-        string beforeCursor = textArea->textLines[line_index].substr(0, char_index);
+        string beforeCursor = "";
+        if (textArea->textLines.size() > 0) {
+            beforeCursor = textArea->textLines[line_index].substr(0, char_index);
+        }
         
-        float x = textArea->rect->getX() + textArea->getLabelWidget()->getStringWidth(beforeCursor);
+        float x = textArea->getRect()->getX() + textArea->getLabelWidget()->getStringWidth(beforeCursor);
         float y = textArea->getLineTopY(line_index);
         
         // cursor color oscillates
         ofxUIFill();
-        ofxUISetColor(label->getColorFillHighlight(), 255.0*fabs(cos(theta)));
+        ofxUISetColor(textArea->getLabelWidget()->getColorFillHighlight(), 255.0*fabs(cos(theta)));
         theta +=0.05;
         ofxUIDrawRect(x, y, cursorWidth, textArea->lineHeight);
     }
@@ -153,7 +164,7 @@ public:
 		{
 			ofxUIFill(); 
             ofxUISetColor(color_fill);
-            textArea->getLabelWidget()->drawString(textArea->rect->getX(), textArea->getLineBottomY(0), defaultstring);
+            textArea->getLabelWidget()->drawString(textArea->getRect()->getX(), textArea->getLineBottomY(0), defaultstring);
 		}        
     }
 	
@@ -247,16 +258,16 @@ public:
             switch (key) 
 			{
 				case OF_KEY_BACKSPACE:
-					if (textstring.size() > 0 && cursorChar > 0) {
+					if (textArea->textstring.size() > 0 && cursorChar > 0) {
                         cursorChar--;
-                        textArea->textstring.erase(cursorPosition, 1);
+                        textArea->textstring.erase(cursorChar, 1);
                         textArea->formatDisplayString();
 					}
 					break;
 
                 case OF_KEY_DEL:
-					if (textstring.size() > 0 && cursorChar < textstring.length()) {
-                        textArea->textstring.erase(cursorPosition, 1);
+					if (textArea->textstring.size() > 0 && cursorChar < textArea->textstring.length()) {
+                        textArea->textstring.erase(cursorChar, 1);
                         textArea->formatDisplayString();
                     }
 					break;
@@ -264,8 +275,7 @@ public:
 				case OF_KEY_RETURN:
                     triggerType = OFX_UI_TEXTINPUT_ON_ENTER;
 					triggerEvent(this);
-					if(autoclear)
-					{
+					if(autoclear) {
 						textArea->textstring.clear();
                         textArea->formatDisplayString();
 					}
@@ -273,22 +283,40 @@ public:
 					break;
 					
 				case OF_KEY_RIGHT:
-                    if(cursorChar < textArea->textstring.length())
-                    {
+                    if(cursorChar < textArea->textstring.length()) {
                         cursorChar++;
                         textArea->formatDisplayString();
                     }
 					break;					
-                    :
+
                 case OF_KEY_LEFT:
-                    if(cursorChar > 0)
-                    {
+                    if(cursorChar > 0) {
                         cursorChar--;
                         textArea->formatDisplayString();
                     }
 					break;
                     
                 case OF_KEY_DOWN:
+                {
+                    ofVec2f char_and_line_indices = getCharLineIndices();
+                    float charIndex = char_and_line_indices[0];
+                    float lineIndex = char_and_line_indices[1];
+                    if (lineIndex < textArea->textLines.size()) {
+                        setCursorChar(charIndex, ++lineIndex); // TODO this will shift the cursor around horizontally depending on character widths - fix this
+                    }
+                }
+                    break;
+                    
+                case OF_KEY_UP:
+                {
+                    ofVec2f char_and_line_indices = getCharLineIndices();
+                    float charIndex = char_and_line_indices[0];
+                    float lineIndex = char_and_line_indices[1];
+                    if (lineIndex > 0) {
+                        setCursorChar(charIndex, --lineIndex); // TODO same char shifting problem as in OF_KEY_DOWN case
+                    }
+                }
+                    break;
 
 #if (OF_VERSION_MINOR > 7)
                 case OF_KEY_TAB:
@@ -326,9 +354,9 @@ public:
                     
 				default:
                 {
-                    textstring.insert(cursorPosition, 1, key);
-                    cursorPosition++;
-                    recalculateDisplayString();
+                    textArea->textstring.insert(cursorChar, 1, key);
+                    cursorChar++;
+                    textArea->formatDisplayString();
                 }
 					break;
 			}
@@ -351,28 +379,28 @@ public:
             {            
                 draw_fill_highlight = false;             
                 draw_outline_highlight = false;  
-				label->unfocus(); 								
+				textArea->getLabelWidget()->unfocus();
             }
                 break;
             case OFX_UI_STATE_OVER:
             {
                 draw_fill_highlight = false;            
                 draw_outline_highlight = true;  
-				label->focus(); 								
+				textArea->getLabelWidget()->focus();
             }
                 break;
             case OFX_UI_STATE_DOWN:
             {
                 draw_fill_highlight = false;            
                 draw_outline_highlight = true;             
-				label->focus(); 					
+				textArea->getLabelWidget()->focus();
             }
                 break;
             case OFX_UI_STATE_SUSTAINED:
             {
                 draw_fill_highlight = false;            
                 draw_outline_highlight = false;                         
-				label->unfocus(); 								
+				textArea->getLabelWidget()->unfocus();
             }
                 break;                            
             default:
@@ -383,7 +411,7 @@ public:
     void setVisible(bool _visible)
     {
         visible = _visible; 
-        label->setVisible(visible); 
+        textArea->setVisible(visible);
     }
     
 	bool isClicked()
@@ -391,14 +419,14 @@ public:
 		return clicked;
 	}
 	
-	ofxUILabel *getLabel()
+	ofxUITextArea *getTextArea()
 	{
-		return label; 
+		return textArea;
 	}
 	
 	string getTextString()
 	{
-		return textstring; 
+		return textArea->textstring;
 	}
 	
     void setTriggerType(int _triggerType)
@@ -413,63 +441,13 @@ public:
 	
 	void setTextString(string s)	
 	{
-		textstring = ""; 
-		string temp = ""; 
-		
-        int length = s.length(); 
-        
-        if(length > 0)
-        {
-            for(int i = 0; i < length; i++)
-            {
-                temp+=s.at(i); 
-                float newWidth = label->getStringWidth(temp); 
-                
-                if(newWidth < rect->width-padding*4.0)
-                {
-                    textstring+=s.at(i); 
-                    label->setLabel(textstring); 
-                }				
-            }		
-        }
-        else
-        {
-            textstring = s; 
-            label->setLabel(textstring);                
-        }
-        displaystring = textstring; 
+		textArea->setTextString(s);
+        cursorChar = 0;
 	}
 	
 	void setParent(ofxUIWidget *_parent)
 	{
-		parent = _parent; 
-        if(rect->height == 0 || rect->height < label->getPaddingRect()->height+padding*2.0)
-        {
-            rect->height = label->getPaddingRect()->height+padding*2.0; 
-        }
-        label->setLabel(textstring);
-		ofxUIRectangle *labelrect = label->getRect(); 
-		float h = labelrect->getHeight(); 
-		float ph = rect->getHeight(); 	
-		
-		labelrect->y = ph/2.0 - h/2.0; 
-		defaultY = labelrect->y+labelrect->getHeight(); 
-		defaultX = labelrect->x; 
- 		
-		paddedRect->height = rect->height+padding*2.0; 
-		
-		cursorWidth = label->getStringWidth("."); 
-        
-        while(label->getStringWidth(textstring) > rect->width-padding*4.0)
-        {
-            string::iterator it;
-            it=textstring.begin();
-            textstring.erase (it);                    
-        }
-        
-        defaultstring = textstring; 
-		displaystring = textstring; 
-        setTextString(textstring);        
+		parent = _parent;     
 	}	
 	
 	void setAutoClear(bool _autoclear)
@@ -481,40 +459,6 @@ public:
     {
         triggerOnClick = _triggerOnClick;
     }
-    
-    void recalculateDisplayString()
-    {
-        // the maximum width of the displaystring
-        float maxWidth = rect->width-padding*4.0;
-        
-        displaystring = textstring;
-        string stringBeforeCursor = displaystring.substr(0, cursorPosition);
-        string stringBeforeLabel =  displaystring.substr(0, firstVisibleCharacterIndex);
-        
-        // if the cursoroffset - length of the (invisible) string before the label < 0, we have to shift our string to the left to get our cursor in the label
-        while(label->getStringWidth(stringBeforeCursor) - label->getStringWidth(stringBeforeLabel) < 0){
-            firstVisibleCharacterIndex --;
-            stringBeforeLabel =  displaystring.substr(0, firstVisibleCharacterIndex);
-        }
-
-        // if the cursoroffset - length of the (invisible) string before the label is > maximum width, we have to shift to the right
-        while(label->getStringWidth(stringBeforeCursor) - label->getStringWidth(stringBeforeLabel) > maxWidth){
-            firstVisibleCharacterIndex ++;
-            stringBeforeLabel =  displaystring.substr(0, firstVisibleCharacterIndex);
-        }
-        
-        // we now know how long the string before the label should be, so trim it off
-        displaystring = displaystring.substr(MIN(firstVisibleCharacterIndex, displaystring.length()));
-        
-        // trim off the end of the string until it fits
-        while(label->getStringWidth(displaystring) > maxWidth && displaystring.length() > 0)
-        {
-            displaystring = displaystring.substr(0, displaystring.size()-1);
-        }
-        
-        label->setLabel(displaystring);
-    }
-
     
 protected:
     // text
