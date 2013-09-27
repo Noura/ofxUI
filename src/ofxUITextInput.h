@@ -31,7 +31,7 @@
 class ofxUITextInput : public ofxUIWidget
 {
 public:
-    ofxUITextInput(string _name, string _textstring, float w, float h = 0, float x = 0, float y = 0, int _size = OFX_UI_FONT_SMALL) : ofxUIWidget()
+    ofxUITextInput(string _name, string _textstring, float w, float h = 0, float x = 0, float y = 0, int _size = OFX_UI_FONT_MEDIUM_SIZE) : ofxUIWidget()
     {
         init(_name, _textstring, w, h, x, y, _size);
     }

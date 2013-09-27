@@ -154,7 +154,7 @@ public:
 			value.y = 0;
 		}
 		
-		label = new ofxUILabel(0,h+padding,(name+" LABEL"), (name + ": " + ofxUIToString(getScaledValue().x,labelPrecision) + ", " + ofxUIToString(getScaledValue().y,labelPrecision)), OFX_UI_FONT_SMALL); 		
+		label = new ofxUILabel(0,h+padding,(name+" LABEL"), (name + ": " + ofxUIToString(getScaledValue().x,labelPrecision) + ", " + ofxUIToString(getScaledValue().y,labelPrecision)), OFX_UI_FONT_SMALL_SIZE);
 		label->setParent(label); 
 		label->setRectParent(rect);         
         label->setEmbedded(true);

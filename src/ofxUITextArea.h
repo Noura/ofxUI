@@ -52,14 +52,8 @@ public:
 		label->setRectParent(rect);
         label->setEmbedded(true);
         
-        if(h == 0)
-        {
-            autoSize = true;
-        }
-        else
-        {
-            autoSize = false;
-        }
+        
+        autoSize = (h == 0);
     }
     
     virtual void drawBack()

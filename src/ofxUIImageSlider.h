@@ -105,11 +105,11 @@ public:
         
 		if(kind == OFX_UI_WIDGET_IMAGESLIDER_H)
 		{
-			label = new ofxUILabel(0,h+padding,(name+" LABEL"), (name + ": " + ofxUIToString(max,labelPrecision)), OFX_UI_FONT_SMALL); 
+			label = new ofxUILabel(0,h+padding,(name+" LABEL"), (name + ": " + ofxUIToString(max,labelPrecision)), OFX_UI_FONT_SMALL_SIZE);
 		}
 		else 
 		{
-			label = new ofxUILabel(0,h+padding,(name+" LABEL"), name, OFX_UI_FONT_SMALL); 	
+			label = new ofxUILabel(0,h+padding,(name+" LABEL"), name, OFX_UI_FONT_SMALL_SIZE);
 		}
         
 		label->setParent(label); 

@@ -86,7 +86,7 @@ public:
     {    
         rect = new ofxUIRectangle(0, 0, 316, ofxUIGetHeight());        
         init(46, ofxUIGetHeight());
-        addWidgetDown(new ofxUILabel(title, OFX_UI_FONT_LARGE));
+        addWidgetDown(new ofxUILabel(title, OFX_UI_FONT_LARGE_SIZE));
         addWidgetDown(new ofxUISpacer(0, 20));
         addWidgetDown(new ofxUIFPSSlider(300, 20, 0, 1000, ofGetFrameRate(), "FPS"));
     }
@@ -2161,6 +2161,7 @@ public:
     
 	void setLabelFont(ofxUILabel *label)
 	{
+        
 		switch(label->getSize())
 		{
 			case OFX_UI_FONT_LARGE_SIZE:

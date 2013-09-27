@@ -68,7 +68,7 @@ public:
         
 		image = _image; 
         
-		label = new ofxUILabel(0,h+padding,(name+" LABEL"),name, OFX_UI_FONT_SMALL); 		
+		label = new ofxUILabel(0,h+padding,(name+" LABEL"),name, OFX_UI_FONT_SMALL_SIZE);
 		label->setParent(label); 
 		label->setRectParent(rect);    
         label->setEmbedded(true);        

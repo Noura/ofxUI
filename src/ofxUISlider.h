@@ -132,11 +132,11 @@ public:
         
 		if(kind == OFX_UI_WIDGET_SLIDER_H)
 		{
-			label = new ofxUILabel(0,h+padding,string(name+" LABEL"), string(name + ": " + ofxUIToString(max,labelPrecision)), OFX_UI_FONT_SMALL);
+			label = new ofxUILabel(0,h+padding,string(name+" LABEL"), string(name + ": " + ofxUIToString(max,labelPrecision)), OFX_UI_FONT_SMALL_SIZE);
 		}
 		else 
 		{
-			label = new ofxUILabel(0,h+padding,string(name+" LABEL"), string(name), OFX_UI_FONT_SMALL);
+			label = new ofxUILabel(0,h+padding,string(name+" LABEL"), string(name), OFX_UI_FONT_SMALL_SIZE);
 		}
         
 		label->setParent(label); 
