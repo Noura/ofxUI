@@ -106,7 +106,6 @@ public:
     }
     
     int getStringIndex() {
-        
         // returns the index in textArea->textstring corresponding with the
         // cursor position specified by cursorChar and cursorLine
         // cursorChar x is between textArea->textstring[x-1] and textArea->textstring[x]
@@ -121,16 +120,19 @@ public:
     }
     
     int setCursorPosition(int stringIndex) {
-        
         // sets cursorChar and cursorLine to correspond with the stringIndex
-        int sum = 0; // count up to stringIndex
+        int count = 0; // count up to stringIndex
         int i = 0;
-        while (i < textArea->textLines.size() &&
-               sum + textArea->textLines[i].size() <= stringIndex) {
-            sum += textArea->textLines[i++].size();
+        
+        for (int i = 0; i < textArea->textLines.size(); i++) {
+            if (count + textArea->textLines[i].size() >= stringIndex) {
+                cursorLine = i;
+                cursorChar = stringIndex - count;
+                break;
+            } else {
+                count += textArea->textLines[i].size();
+            }
         }
-        cursorLine = MIN(i, textArea->textLines.size() - 1);
-        cursorChar = stringIndex - sum;
     }
     
     void clearText() {
@@ -143,7 +145,6 @@ public:
     /* DRAWING ****************************************************************/
     
     virtual void drawCursor() {
-        
         ofxUILabel * label = textArea->getLabelWidget();
         float spaceWidth = label->getStringWidth("c at") - label->getStringWidth("cat");
         
@@ -151,8 +152,21 @@ public:
         if (textArea->textLines.size() > 0) {
             beforeCursor = textArea->textLines[cursorLine].substr(0, cursorChar);
         }
+        float xOffset = label->getStringWidth(beforeCursor);
+        if (beforeCursor.size() > 0) {
+            
+            string space = " ";
+            string first = beforeCursor.substr(0, 1);
+            string last = beforeCursor.substr(beforeCursor.size()-1);
+            if (first.compare(space) == 0) {
+                xOffset += spaceWidth;
+            }
+            if (last.compare(space) == 0) {
+                xOffset += spaceWidth;
+            }
+        }
         
-        float x = textArea->getRect()->getX() + textArea->getLabelWidget()->getStringWidth("."+beforeCursor+".");
+        float x = textArea->getRect()->getX() + xOffset;
         float y = textArea->getLineTopY(cursorLine);
         
         // cursor color oscillates
