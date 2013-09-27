@@ -124,6 +124,13 @@ public:
     }
 
     virtual void drawCursor() {
+        float w1 = textArea->getLabelWidget()->getStringWidth(" cat");
+        float w2 = textArea->getLabelWidget()->getStringWidth("cat");
+        float w3 = textArea->getLabelWidget()->getStringWidth(" ");
+        float w4 = textArea->getLabelWidget()->getStringWidth("c at");
+        
+        cout << "w1 " << w1 << " w2 " << w2 << " w3 " << w3 << " w4 " << w4 << endl;
+        
         
         ofVec2f char_and_line = getCharLineIndices();
         float char_index = char_and_line[0];
@@ -134,7 +141,7 @@ public:
             beforeCursor = textArea->textLines[line_index].substr(0, char_index);
         }
         
-        float x = textArea->getRect()->getX() + textArea->getLabelWidget()->getStringWidth(beforeCursor);
+        float x = textArea->getRect()->getX() + textArea->getLabelWidget()->getStringWidth("."+beforeCursor);
         float y = textArea->getLineTopY(line_index);
         
         // cursor color oscillates

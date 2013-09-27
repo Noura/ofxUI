@@ -52,8 +52,10 @@ public:
 		label->setRectParent(rect);
         label->setEmbedded(true);
         
-        
         autoSize = (h == 0);
+        
+        lineHeight = label->getLineHeight() * 1.5;
+        lineSpaceSize = lineHeight * 0.5;
     }
     
     virtual void drawBack()
@@ -92,7 +94,7 @@ public:
         return rect->getY() + (line_index + 1) * (lineHeight + lineSpaceSize) - lineSpaceSize;
     }
     float getLineTopY(int line_index) {
-        return rect->getY() + line_index * lineHeight + MAX(line_index-1, 0) * lineSpaceSize;
+        return getLineBottomY(line_index) - lineHeight;
     }
     
     void draw() {
@@ -122,9 +124,6 @@ public:
     void formatDisplayString()
     {        
         textLines.clear();
-        
-        lineHeight = label->getLineHeight() * 1.5;
-        lineSpaceSize = lineHeight * 0.5;
         
         float widthLimit = rect->getWidth() - label->getStringWidth("M");
         if (widthLimit < label->getStringWidth("M")) {
