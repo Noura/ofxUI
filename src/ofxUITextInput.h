@@ -99,7 +99,8 @@ public:
         if(textArea->textstring == "" ||
            cursorChar < textArea->textLines[cursorLine].size() - 1) {
             cursorChar++;
-        } else if (cursorLine < textArea->textLines.size()) {
+        } else if (cursorLine < textArea->textLines.size() &&
+                   cursorLine < textArea->textLines.size() - 1) {
             cursorLine++;
             cursorChar = 0;
         }
@@ -161,7 +162,7 @@ public:
             if (first.compare(space) == 0) {
                 xOffset += spaceWidth;
             }
-            if (last.compare(space) == 0) {
+            if (beforeCursor.size() > 1 && last.compare(space) == 0) {
                 xOffset += spaceWidth;
             }
         }
@@ -307,6 +308,9 @@ public:
     
     void keyPressed(int key)
     {
+        
+        cout << "KEY PRESSED " << key << endl;
+        
 		if(clicked)
 		{
             switch (key)
@@ -356,12 +360,14 @@ public:
                 case OF_KEY_DOWN:
                     if (cursorLine < textArea->textLines.size() - 1) {
                         cursorLine++;
+                        cursorChar = MIN(cursorChar, textArea->textLines[cursorLine].size());
                     }
                     break;
                     
                 case OF_KEY_UP:
                     if (cursorLine > 0) {
                         cursorLine--;
+                        cursorChar = MIN(cursorChar, textArea->textLines[cursorLine].size());
                     }
                     break;
 
