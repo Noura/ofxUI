@@ -31,6 +31,9 @@
 class ofxUITextInput : public ofxUIWidget
 {
 public:
+    
+    /* CONSTRUCTORS ***********************************************************/
+    
     ofxUITextInput(string _name, string _textstring, float w, float h = 0, float x = 0, float y = 0, int _size = OFX_UI_FONT_MEDIUM_SIZE) : ofxUIWidget()
     {
         init(_name, _textstring, w, h, x, y, _size);
@@ -63,7 +66,7 @@ public:
 		kind = OFX_UI_WIDGET_TEXTINPUT;
 
 		defaultstring = _textstring;;
-        textArea = new ofxUITextArea(_name, _textstring, w, h, x, y, _size);
+        textArea = new ofxUITextArea(_name, _textstring, rect->width, rect->height, rect->x, rect->y, _size);
         
 		clicked = false;
         autoclear = true;
@@ -76,73 +79,81 @@ public:
 		theta = 0;
 
         cursorChar = 0;
+        cursorLine = 0;
     }
     
-    virtual void setDrawPadding(bool _draw_padded_rect)
-	{
-		draw_padded_rect = _draw_padded_rect; 
-        textArea->setDrawPadding(false);
-	}
+    /* CURSOR ARITHMETIC ******************************************************/
     
-    virtual void setDrawPaddingOutline(bool _draw_padded_rect_outline)
-	{
-		draw_padded_rect_outline = _draw_padded_rect_outline; 
-        textArea->setDrawPaddingOutline(false);
-	}  
-    
-    void boundCursorChar() {
-        cursorChar = MIN(cursorChar, textArea->textstring.size());
-        cursorChar = MAX(0, cursorChar);
-    }
-    
-    virtual void setCursorChar(int charIndex, int lineIndex) {
-        int i = 0;
-        int currentLineIndex = 0;
-        while (currentLineIndex < lineIndex) {
-            i += textArea->textLines[currentLineIndex++].size();
+    void moveCursorBackward() {
+        
+        if(cursorChar > 0) {
+            cursorChar--;
+        } else if (cursorLine > 0) {
+            cursorLine--;
+            cursorChar = textArea->textLines[cursorLine].size() - 1;
         }
-        i += charIndex;
-        cursorChar = i;
-    }
-    
-    virtual ofVec2f getCharLineIndices() {
-        boundCursorChar();
-        int charIndex = 0;
-        int lineIndex = 0;
-        int i = 0;
-        while (i < cursorChar) {
-            i++;
-            if (charIndex <= textArea->textLines[lineIndex].size()) {
-                charIndex++;
-            } else {
-                lineIndex++;
-                charIndex = 0;
-            }
-        }
-        ofVec2f res(charIndex, lineIndex);
-        return res;
     }
 
+    void moveCursorForward() {
+        
+        if(textArea->textstring == "" ||
+           cursorChar < textArea->textLines[cursorLine].size() - 1) {
+            cursorChar++;
+        } else if (cursorLine < textArea->textLines.size()) {
+            cursorLine++;
+            cursorChar = 0;
+        }
+    }
+    
+    int getStringIndex() {
+        
+        // returns the index in textArea->textstring corresponding with the
+        // cursor position specified by cursorChar and cursorLine
+        // cursorChar x is between textArea->textstring[x-1] and textArea->textstring[x]
+        // cursorChar = 0 is before textArea->textstring[0]
+        int i = 0;
+        int currentLineIndex = 0;
+        while (currentLineIndex < cursorLine) {
+            i += textArea->textLines[currentLineIndex++].size();
+        }
+        i += cursorChar;
+        return i;
+    }
+    
+    int setCursorPosition(int stringIndex) {
+        
+        // sets cursorChar and cursorLine to correspond with the stringIndex
+        int sum = 0; // count up to stringIndex
+        int i = 0;
+        while (i < textArea->textLines.size() &&
+               sum + textArea->textLines[i].size() <= stringIndex) {
+            sum += textArea->textLines[i++].size();
+        }
+        cursorLine = MIN(i, textArea->textLines.size() - 1);
+        cursorChar = stringIndex - sum;
+    }
+    
+    void clearText() {
+        textArea->textstring.clear();
+        textArea->formatDisplayString();
+        cursorChar = 0;
+        cursorLine = 0;
+    }
+    
+    /* DRAWING ****************************************************************/
+    
     virtual void drawCursor() {
-        float w1 = textArea->getLabelWidget()->getStringWidth(" cat");
-        float w2 = textArea->getLabelWidget()->getStringWidth("cat");
-        float w3 = textArea->getLabelWidget()->getStringWidth(" ");
-        float w4 = textArea->getLabelWidget()->getStringWidth("c at");
         
-        cout << "w1 " << w1 << " w2 " << w2 << " w3 " << w3 << " w4 " << w4 << endl;
-        
-        
-        ofVec2f char_and_line = getCharLineIndices();
-        float char_index = char_and_line[0];
-        float line_index = char_and_line[1];
+        ofxUILabel * label = textArea->getLabelWidget();
+        float spaceWidth = label->getStringWidth("c at") - label->getStringWidth("cat");
         
         string beforeCursor = "";
         if (textArea->textLines.size() > 0) {
-            beforeCursor = textArea->textLines[line_index].substr(0, char_index);
+            beforeCursor = textArea->textLines[cursorLine].substr(0, cursorChar);
         }
         
-        float x = textArea->getRect()->getX() + textArea->getLabelWidget()->getStringWidth("."+beforeCursor);
-        float y = textArea->getLineTopY(line_index);
+        float x = textArea->getRect()->getX() + textArea->getLabelWidget()->getStringWidth("."+beforeCursor+".");
+        float y = textArea->getLineTopY(cursorLine);
         
         // cursor color oscillates
         ofxUIFill();
@@ -150,6 +161,19 @@ public:
         theta +=0.05;
         ofxUIDrawRect(x, y, cursorWidth, textArea->lineHeight);
     }
+    
+    
+    virtual void setDrawPadding(bool _draw_padded_rect)
+	{
+		draw_padded_rect = _draw_padded_rect;
+        textArea->setDrawPadding(false);
+	}
+    
+    virtual void setDrawPaddingOutline(bool _draw_padded_rect_outline)
+	{
+		draw_padded_rect_outline = _draw_padded_rect_outline;
+        textArea->setDrawPaddingOutline(false);
+	}
     
     virtual void drawFill() 
     {
@@ -172,9 +196,18 @@ public:
 			ofxUIFill(); 
             ofxUISetColor(color_fill);
             textArea->getLabelWidget()->drawString(textArea->getRect()->getX(), textArea->getLineBottomY(0), defaultstring);
-		}        
+		}
+
+        // DEBUG print out cursorChar, cursorPos.Line, cursorPos.Char
+        int i = getStringIndex();
+        stringstream s;
+        s << "string index: " << i << " cursorLine: " << cursorLine << " cursorChar: " << cursorChar << endl;
+        ofSetColor(0);
+        ofDrawBitmapString(s.str(), 600, 300);
     }
-	
+
+    /* EVENT CALLBACKS ********************************************************/
+    
     void mouseMoved(int x, int y ) 
     {
         if(rect->inside(x, y))
@@ -257,72 +290,65 @@ public:
         hit = false; 
         stateChange();         
     }
-	
-    void keyPressed(int key) 
+    
+    void keyPressed(int key)
     {
-		if(clicked)            
+		if(clicked)
 		{
-            switch (key) 
+            switch (key)
 			{
 				case OF_KEY_BACKSPACE:
-					if (textArea->textstring.size() > 0 && cursorChar > 0) {
-                        cursorChar--;
-                        textArea->textstring.erase(cursorChar, 1);
-                        textArea->formatDisplayString();
-					}
+                {
+                    if (textArea->textstring.size() > 0) {
+                        int i = getStringIndex();
+                        if (i > 0) {
+                            textArea->textstring.erase(i - 1, 1);
+                            textArea->formatDisplayString();
+                            setCursorPosition(i - 1);
+                        }
+                    }
+                }
 					break;
 
                 case OF_KEY_DEL:
-					if (textArea->textstring.size() > 0 && cursorChar < textArea->textstring.length()) {
-                        textArea->textstring.erase(cursorChar, 1);
-                        textArea->formatDisplayString();
+                {
+					if (textArea->textstring.size() > 0) {
+                        int i = getStringIndex();
+                        if (i < textArea->textstring.size()) {
+                            textArea->textstring.erase(i, 1);
+                            textArea->formatDisplayString();
+                            setCursorPosition(i);
+                        }
                     }
+                }
 					break;
 					
 				case OF_KEY_RETURN:
                     triggerType = OFX_UI_TEXTINPUT_ON_ENTER;
 					triggerEvent(this);
 					if(autoclear) {
-						textArea->textstring.clear();
-                        textArea->formatDisplayString();
+						clearText();
 					}
-                    clicked = false;
 					break;
 					
 				case OF_KEY_RIGHT:
-                    if(cursorChar < textArea->textstring.length()) {
-                        cursorChar++;
-                        textArea->formatDisplayString();
-                    }
+                    moveCursorForward();
 					break;					
 
                 case OF_KEY_LEFT:
-                    if(cursorChar > 0) {
-                        cursorChar--;
-                        textArea->formatDisplayString();
-                    }
+                    moveCursorBackward();
 					break;
                     
                 case OF_KEY_DOWN:
-                {
-                    ofVec2f char_and_line_indices = getCharLineIndices();
-                    float charIndex = char_and_line_indices[0];
-                    float lineIndex = char_and_line_indices[1];
-                    if (lineIndex < textArea->textLines.size()) {
-                        setCursorChar(charIndex, ++lineIndex); // TODO this will shift the cursor around horizontally depending on character widths - fix this
+                    if (cursorLine < textArea->textLines.size() - 1) {
+                        cursorLine++;
                     }
-                }
                     break;
                     
                 case OF_KEY_UP:
-                {
-                    ofVec2f char_and_line_indices = getCharLineIndices();
-                    float charIndex = char_and_line_indices[0];
-                    float lineIndex = char_and_line_indices[1];
-                    if (lineIndex > 0) {
-                        setCursorChar(charIndex, --lineIndex); // TODO same char shifting problem as in OF_KEY_DOWN case
+                    if (cursorLine > 0) {
+                        cursorLine--;
                     }
-                }
                     break;
 
 #if (OF_VERSION_MINOR > 7)
@@ -361,9 +387,10 @@ public:
                     
 				default:
                 {
-                    textArea->textstring.insert(cursorChar, 1, key);
-                    cursorChar++;
+                    int i = getStringIndex();
+                    textArea->textstring.insert(i, 1, key);
                     textArea->formatDisplayString();
+                    setCursorPosition(i + 1);
                 }
 					break;
 			}
@@ -379,6 +406,7 @@ public:
 			triggerEvent(this);             
         }
     }
+
     void stateChange()
     {        
         switch (state) {
@@ -415,6 +443,8 @@ public:
         }        
     }
 	
+    /* GETTERS & SETTERS ******************************************************/
+    
     void setVisible(bool _visible)
     {
         visible = _visible; 
@@ -478,8 +508,7 @@ protected:
     
     // drawing the cursor
 	float theta, cursorWidth, cursorOffset;
-    int cursorChar; // the char index in textArea->textstring immediately after
-                    // which to draw the cursor
+    int cursorChar, cursorLine;
 
 }; 
 
