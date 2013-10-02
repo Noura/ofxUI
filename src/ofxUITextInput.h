@@ -343,6 +343,7 @@ public:
 					triggerEvent(this);
 					if(autoclear) {
 						clearText();
+                        clicked = true;
 					}
 					break;
 					
