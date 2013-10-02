@@ -35,7 +35,7 @@ public:
         
     ~ofxUIScrollbarCanvas() {
         delete scrollbar;
-        //TODO delete other things in separate commit
+        delete scrollbarTrack;
     }
         
     // returns the bounds of the area that is not obscured behind the scroll bar
