@@ -342,6 +342,8 @@ public:
                     triggerType = OFX_UI_TEXTINPUT_ON_ENTER;
 					triggerEvent(this);
 					if(autoclear) {
+                        string input = textArea->textstring.substr();
+                        ofNotifyEvent(inputSubmitted, input, this);
 						clearText();
                         clicked = true;
 					}
@@ -559,6 +561,8 @@ public:
     {
         triggerOnClick = _triggerOnClick;
     }
+    
+    ofEvent<string> inputSubmitted;
     
 protected:
     // text
