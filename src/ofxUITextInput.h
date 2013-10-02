@@ -1,4 +1,4 @@
-/********************************************************************************** 
+/**********************************************************************************
  
  Copyright (C) 2012 Syed Reza Ali (www.syedrezaali.com)
  
@@ -24,6 +24,9 @@
 
 #ifndef OFXUI_TEXT_INPUT
 #define OFXUI_TEXT_INPUT
+
+// TODO better way to do this; I think this is mac-only
+#define OFXUI_KEY_BACK_QUOTE 161
 
 #include "ofxUIWidgetWithLabel.h"
 #include "ofxUITextArea.h"
@@ -80,22 +83,25 @@ public:
 
         cursorChar = 0;
         cursorLine = 0;
+        
+        shiftKeyPressed = false;
+
     }
     
     /* CURSOR ARITHMETIC ******************************************************/
     
     void moveCursorBackward() {
-        
         if(cursorChar > 0) {
             cursorChar--;
         } else if (cursorLine > 0) {
             cursorLine--;
             cursorChar = textArea->textLines[cursorLine].size() - 1;
         }
+        cursorLine = CLAMP(cursorLine, 0, textArea->textLines.size() - 1);
+        cursorChar = CLAMP(cursorChar, 0, textArea->textLines[cursorLine].size());
     }
 
     void moveCursorForward() {
-        
         if(textArea->textstring == "" ||
            cursorChar < textArea->textLines[cursorLine].size() - 1) {
             cursorChar++;
@@ -104,6 +110,8 @@ public:
             cursorLine++;
             cursorChar = 0;
         }
+        cursorLine = CLAMP(cursorLine, 0, textArea->textLines.size() - 1);
+        cursorChar = CLAMP(cursorChar, 0, textArea->textLines[cursorLine].size());
     }
     
     int getStringIndex() {
@@ -117,6 +125,7 @@ public:
             i += textArea->textLines[currentLineIndex++].size();
         }
         i += cursorChar;
+        i = CLAMP(i, 0, textArea->textstring.size());
         return i;
     }
     
@@ -134,6 +143,8 @@ public:
                 count += textArea->textLines[i].size();
             }
         }
+        cursorLine = CLAMP(cursorLine, 0, textArea->textLines.size() - 1);
+        cursorChar = CLAMP(cursorChar, 0, textArea->textLines[cursorLine].size());
     }
     
     void clearText() {
@@ -147,25 +158,14 @@ public:
     
     virtual void drawCursor() {
         ofxUILabel * label = textArea->getLabelWidget();
-        float spaceWidth = label->getStringWidth("c at") - label->getStringWidth("cat");
-        
+
         string beforeCursor = "";
         if (textArea->textLines.size() > 0) {
             beforeCursor = textArea->textLines[cursorLine].substr(0, cursorChar);
         }
-        float xOffset = label->getStringWidth(beforeCursor);
-        if (beforeCursor.size() > 0) {
-            
-            string space = " ";
-            string first = beforeCursor.substr(0, 1);
-            string last = beforeCursor.substr(beforeCursor.size()-1);
-            if (first.compare(space) == 0) {
-                xOffset += spaceWidth;
-            }
-            if (beforeCursor.size() > 1 && last.compare(space) == 0) {
-                xOffset += spaceWidth;
-            }
-        }
+        // we need to put "." on both ends of the string so that the width of
+        // white space at the beginning or end of the string is included
+        float xOffset = label->getStringWidth("." + beforeCursor + ".") - label->getStringWidth("..");
         
         float x = textArea->getRect()->getX() + xOffset;
         float y = textArea->getLineTopY(cursorLine);
@@ -302,15 +302,12 @@ public:
         {
             state = OFX_UI_STATE_NORMAL;         
         }
-        hit = false; 
+        hit = false;
         stateChange();         
     }
-    
-    void keyPressed(int key)
-    {
-        
-        cout << "KEY PRESSED " << key << endl;
-        
+   
+    void keyPressed(int key) {
+
 		if(clicked)
 		{
             switch (key)
@@ -360,14 +357,14 @@ public:
                 case OF_KEY_DOWN:
                     if (cursorLine < textArea->textLines.size() - 1) {
                         cursorLine++;
-                        cursorChar = MIN(cursorChar, textArea->textLines[cursorLine].size());
+                        cursorChar = CLAMP(cursorChar, 0, textArea->textLines[cursorLine].size());
                     }
                     break;
                     
                 case OF_KEY_UP:
                     if (cursorLine > 0) {
                         cursorLine--;
-                        cursorChar = MIN(cursorChar, textArea->textLines[cursorLine].size());
+                        cursorChar = CLAMP(cursorChar, 0, textArea->textLines[cursorLine].size());
                     }
                     break;
 
@@ -375,8 +372,6 @@ public:
                 case OF_KEY_TAB:
                 case OF_KEY_COMMAND:
                 case OF_KEY_CONTROL:
-                case OF_KEY_LEFT_SHIFT:
-                case OF_KEY_RIGHT_SHIFT:
                 case OF_KEY_LEFT_CONTROL:
                 case OF_KEY_RIGHT_CONTROL:
                 case OF_KEY_LEFT_ALT:
@@ -402,19 +397,66 @@ public:
                 case OF_KEY_END:
                 case OF_KEY_INSERT:
                 case OF_KEY_ALT:
-                case OF_KEY_SHIFT:
                 break;
+                  
+                case OF_KEY_LEFT_SHIFT:
+                case OF_KEY_RIGHT_SHIFT:
+                case OF_KEY_SHIFT:
+                    shiftKeyPressed = true;
+                    break;
                     
 				default:
                 {
+                    char c = key;
+                    if (key == OFXUI_KEY_BACK_QUOTE) { //TODO better way to do this
+                        c = '`';
+                    }
+                    if (shiftKeyPressed) {
+                        if (key == OFXUI_KEY_BACK_QUOTE) c = '~';
+                        if (key == '1') c = '!';
+                        if (key == '2') c = '@';
+                        if (key == '3') c = '#';
+                        if (key == '4') c = '$';
+                        if (key == '5') c = '%';
+                        if (key == '6') c = '^';
+                        if (key == '7') c = '&';
+                        if (key == '8') c = '*';
+                        if (key == '9') c = '(';
+                        if (key == '0') c = ')';
+                        if (key == '-') c = '_';
+                        if (key == '=') c = '+';
+                        if (key == '[') c = '{';
+                        if (key == ']') c = '}';
+                        if (key == '\\') c = '|';
+                        if (key == ';') c = ':';
+                        if (key == '\'') c = '"';
+                        if (key == ',') c = '<';
+                        if (key == '.') c = '>';
+                        if (key == '/') c = '?';
+                    }
                     int i = getStringIndex();
-                    textArea->textstring.insert(i, 1, key);
+                    textArea->textstring.insert(i, 1, c);
                     textArea->formatDisplayString();
                     setCursorPosition(i + 1);
                 }
 					break;
 			}
 		}
+    }
+    
+    void keyReleased(int key) {
+
+        if (clicked) {
+            switch (key) {
+                case OF_KEY_LEFT_SHIFT:
+                case OF_KEY_RIGHT_SHIFT:
+                case OF_KEY_SHIFT:
+                    shiftKeyPressed = false;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
         
     void unClick()
@@ -529,6 +571,9 @@ protected:
     // drawing the cursor
 	float theta, cursorWidth, cursorOffset;
     int cursorChar, cursorLine;
+    
+    // whether the shift key is pressed
+    bool shiftKeyPressed;
 
 }; 
 
