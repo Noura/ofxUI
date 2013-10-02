@@ -20,7 +20,7 @@ class ofxUIScrollbarCanvas : public ofxUIScrollableCanvas {
 
 public:
     
-    ofxUIScrollbarCanvas(float _x, float _y, float _w, float _h, float _contentHeight = 1000)
+    ofxUIScrollbarCanvas(float _x, float _y, float _w, float _h)
     : ofxUIScrollableCanvas(_x, _y, _w, _h)
     , init_x(_x) ,init_y(_y), init_w(_w), init_h(_h) {
         scrollbar_w = OFX_UI_MIN_SCROLLBAR_W;
@@ -30,7 +30,7 @@ public:
         scrollbarTrack = new ofRectangle(_x + _w - scrollbar_w, _y, scrollbar_w, _h);
         scrollbar = new ofxUIDraggableRect(_x + _w - scrollbar_w, _y, scrollbar_w, scrollbar_h, *scrollbarTrack);
         
-        setContentHeight(_contentHeight);
+        setContentHeight(_h);
     }
         
     ~ofxUIScrollbarCanvas() {

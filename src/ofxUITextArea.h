@@ -53,6 +53,9 @@ public:
         label->setEmbedded(true);
         
         autoSize = (h == 0);
+        if (autoSize) {
+            setHeightForContent();
+        }
         
         lineHeight = label->getLineHeight() * 1.5;
         lineSpaceSize = lineHeight * 0.5;
@@ -173,11 +176,15 @@ public:
         }
         
         if (autoSize) {
-            rect->setHeight(textLines.size() * (lineHeight + lineSpaceSize));
+            setHeightForContent();
             paddedRect->setHeight(rect->getHeight() + 2.0*padding);
         }
-     }
+    }
 
+    void setHeightForContent() {
+        rect->setHeight(textLines.size() * (lineHeight + lineSpaceSize));
+    }
+    
 	void setParent(ofxUIWidget *_parent)
 	{
 		parent = _parent;
