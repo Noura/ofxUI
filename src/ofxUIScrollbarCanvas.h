@@ -48,15 +48,21 @@ public:
         scrollbar->draw();
     }
     
-    // You have to tell it how long the content will be if you want it to properly scroll to the bottom of the content.
+    // You have to tell it how long the content will be if you want it to
+    // properly scroll to the bottom of the content. I know this kind of sucks,
+    // but I did not find a good way to calculate the height of all widgets in
+    // the canvas. Every time you add a widget to the ofxUIScrollBarCanvas you
+    // should call setContentHeight.
     void setContentHeight(float _contentHeight) {
         contentHeight = _contentHeight;
-        scrollbar_h = MAX(OFX_UI_MIN_SCROLLBAR_H, MIN(init_h * init_h / contentHeight, init_h));
-        
+        scrollbar_h = CLAMP(init_h * init_h / contentHeight, OFX_UI_MIN_SCROLLBAR_H, contentHeight);
         scrollbar->setHeight(scrollbar_h);
-        
         scrollTop = init_y + scrollbar->height/2;
         scrollBottom = init_y + init_h - scrollbar->height/2;
+    }
+    
+    float getContentHeight() {
+        return contentHeight;
     }
     
     // This will re-flow the content to fill gaps left by removed widgets
@@ -112,8 +118,6 @@ public:
         rect->y = init_y - (contentHeight - init_h);
         scrollbar->y = init_y + (init_h - scrollbar->height);
     }
-    
-    
     
 protected:
     //TODO I think I can use sRect dimensions instead of init_*
