@@ -91,6 +91,9 @@ public:
         }
     }
 
+    // dragging on the scrollbar will scroll that way
+    // dragging on the canvas will scroll according to ofxUICanvas scrolling,
+    // and then update the scrollbar's position accordingly
     void mouseDragged(int x, int y, int button) {
         if (scrollbar->isHit() && scrollBottom != scrollTop) {
             float scrollPercent = (scrollbar->getCenterY() - scrollTop) / (scrollBottom - scrollTop);
