@@ -212,13 +212,6 @@ public:
             ofxUISetColor(color_fill);
             textArea->getLabelWidget()->drawString(textArea->getRect()->getX(), textArea->getLineBottomY(0), defaultstring);
 		}
-
-        // DEBUG print out cursorChar, cursorPos.Line, cursorPos.Char
-        int i = getStringIndex();
-        stringstream s;
-        s << "string index: " << i << " cursorLine: " << cursorLine << " cursorChar: " << cursorChar << endl;
-        ofSetColor(0);
-        ofDrawBitmapString(s.str(), 600, 300);
     }
 
     /* EVENT CALLBACKS ********************************************************/
