@@ -35,7 +35,7 @@ public:
         
     ~ofxUIScrollbarCanvas() {
         delete scrollbar;
-        //TODO delete other things (in separate commit)
+        //TODO delete other things in separate commit
     }
         
     // returns the bounds of the area that is not obscured behind the scroll bar
@@ -94,16 +94,23 @@ public:
     void mouseDragged(int x, int y, int button) {
         if (scrollbar->isHit() && scrollBottom != scrollTop) {
             float scrollPercent = (scrollbar->getCenterY() - scrollTop) / (scrollBottom - scrollTop);
+            scrollPercent = CLAMP(scrollPercent, 0.0, 1.0);
             rect->y = init_y - scrollPercent * (contentHeight - init_h);
         } else {
             ofxUIScrollableCanvas::mouseDragged(x, y, button);
             float scrollPercent = (init_y - rect->y) / (contentHeight - init_h);
-            scrollPercent = MAX(0.0, scrollPercent);
-            scrollPercent = MIN(1.0, scrollPercent);
+            scrollPercent = CLAMP(scrollPercent, 0.0, 1.0);
             float scrollbarY = init_y + scrollPercent * (init_h - scrollbar->height);
             scrollbar->y = scrollbarY;
         }
     }
+    
+    void scrollToBottom() {
+        rect->y = init_y - (contentHeight - init_h);
+        scrollbar->y = init_y + (init_h - scrollbar->height);
+    }
+    
+    
     
 protected:
     //TODO I think I can use sRect dimensions instead of init_*
