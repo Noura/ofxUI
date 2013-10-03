@@ -257,8 +257,7 @@ public:
 			theta = 0;
 			hit = true;
 #endif
-
-            cursorChar = textArea->textstring.size();
+            setCursorPosition(textArea->textstring.size());
             
             state = OFX_UI_STATE_DOWN;     
 			triggerType = OFX_UI_TEXTINPUT_ON_FOCUS;
