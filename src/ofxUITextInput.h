@@ -131,6 +131,12 @@ public:
     
     int setCursorPosition(int stringIndex) {
         // sets cursorChar and cursorLine to correspond with the stringIndex
+        if (textArea->textLines.size() == 0) {
+            cursorLine = 0;
+            cursorChar = 0;
+            return;
+        }
+        
         int count = 0; // count up to stringIndex
         int i = 0;
         
@@ -244,41 +250,32 @@ public:
     
     void mousePressed(int x, int y, int button) 
     {
-        if(rect->inside(x, y))
-        {
-			if(state == OFX_UI_STATE_OVER)
-			{
-				clicked = true; 
-				theta = 0; 
-                hit = true; 
-			}
-#ifdef TARGET_OPENGLES
-			clicked = true;
-			theta = 0;
-			hit = true;
-#endif
-            setCursorPosition(textArea->textstring.size());
-            
-            state = OFX_UI_STATE_DOWN;     
-			triggerType = OFX_UI_TEXTINPUT_ON_FOCUS;
-            
-            if(triggerOnClick)
-            {
-                triggerEvent(this);
-            }
-        }
-        else
-        {
-            state = OFX_UI_STATE_NORMAL;
-            if(clicked)
-            {
-                unClick();  
-            }
-        }
-        stateChange();         
+        if(rect->inside(x, y)) focus();
+        else unfocus();
     }
     
-    void mouseReleased(int x, int y, int button) 
+    void focus() {
+        clicked = true;
+        theta = 0;
+        hit = true;
+        
+        setCursorPosition(textArea->textstring.size());
+        
+        state = OFX_UI_STATE_DOWN;
+        triggerType = OFX_UI_TEXTINPUT_ON_FOCUS;
+        
+        if(triggerOnClick) triggerEvent(this);
+        
+        stateChange();
+    }
+    
+    void unfocus() {
+        state = OFX_UI_STATE_NORMAL;
+        if(clicked) unClick();
+        stateChange();
+    }
+    
+    void mouseReleased(int x, int y, int button)
     {
         if(hit)
         {
@@ -512,7 +509,7 @@ public:
 	{
 		return clicked;
 	}
-	
+    
 	ofxUITextArea *getTextArea()
 	{
 		return textArea;
