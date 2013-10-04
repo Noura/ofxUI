@@ -1,7 +1,16 @@
 /*
  *  ofxUIScrollbarCanvas.h
  *
- *  an ofxUIRectangle that can be dragged around with the mouse
+ *  This is intended to be used as a vertically scrolling list of items that can
+ *  be dynamically added to and removed from. To enable the list to be dynamic,
+ *  some of the features of ofxUICanvas or ofxUIScrollableCanvas have been
+ *  removed.
+ *  
+ *  To add widgets you should only use
+ *  ofxUIScrollbarCanvas::addWidgetToList
+ *
+ *  To remove widgets you should only use
+ *  ofxUIScrollbarCanvas::removeWidgetFromList
  *
  *  Created on: Sep 13, 2013
  *      Author: noura
@@ -22,7 +31,11 @@ public:
     
     ofxUIScrollbarCanvas(float _x, float _y, float _w, float _h)
     : ofxUIScrollableCanvas(_x, _y, _w, _h)
-    , init_x(_x) ,init_y(_y), init_w(_w), init_h(_h) {
+    , init_x(_x)
+    , init_y(_y)
+    , init_w(_w)
+    , init_h(_h)
+    , listPadding(10.0) {
         scrollbar_w = OFX_UI_MIN_SCROLLBAR_W;
         scrollbar_h = OFX_UI_MIN_SCROLLBAR_H;
         kind = OFX_UI_WIDGET_SCROLLBARCANVAS;
@@ -32,27 +45,47 @@ public:
         
         setContentHeight(_h);
     }
-        
+
     ~ofxUIScrollbarCanvas() {
         delete scrollbar;
         delete scrollbarTrack;
-    }
-        
-    // returns the bounds of the area that is not obscured behind the scroll bar
-    ofRectangle getAvailableSpace()  {
-        return ofRectangle(rect->x, rect->y, rect->width - scrollbar_w, rect->height);
+        for (list<ofxUIWidget*>::iterator it = listItems.begin(); it != listItems.end(); it++) {
+            delete (*it);
+        }
     }
     
-    void draw() {
-        ofxUIScrollableCanvas::draw();
-        scrollbar->draw();
+    ofxUIWidget* addWidgetToList(ofxUIWidget * widget) {
+        listItems.push_back(widget);
+        reflowWidgets();
     }
     
-    // You have to tell it how long the content will be if you want it to
-    // properly scroll to the bottom of the content. I know this kind of sucks,
-    // but I did not find a good way to calculate the height of all widgets in
-    // the canvas. Every time you add a widget to the ofxUIScrollBarCanvas you
-    // should call setContentHeight.
+    void removeWidgetFromList(ofxUIWidget * widget) {
+        for (list<ofxUIWidget*>::iterator it = listItems.begin(); it != listItems.end(); it++) {
+            if ((*it) == widget) {
+                listItems.erase(it);
+                delete widget;
+            }
+        }
+    }
+    
+    list<ofxUIWidget*> getWidgetList() {
+        return listItems;
+    }
+    
+    void reflowWidgets() {
+        float y = init_y + listPadding;
+        for (list<ofxUIWidget*>::iterator it = listItems.begin(); it != listItems.end(); it++) {
+            ofxUIWidget *w = (*it);
+            w->getRect()->y = y;
+            float h = MAX(w->getRect()->height, w->getPaddingRect()->height);
+            if (w->hasLabel()) {
+                ((ofxUIWidgetWithLabel*)w)->getLabelWidget()->getRect()->y = y;
+            }
+            y += h + listPadding;
+        }
+        setContentHeight(y - init_y);
+    }
+    
     void setContentHeight(float _contentHeight) {
         contentHeight = _contentHeight;
         scrollbar_h = CLAMP(init_h * init_h / contentHeight, OFX_UI_MIN_SCROLLBAR_H, contentHeight);
@@ -65,15 +98,27 @@ public:
         return contentHeight;
     }
     
-    // This will re-flow the content to fill gaps left by removed widgets
-    void reflowWidgets(vector<ofxUIWidget*> ws, float _h, float y0) {
-        float y = y0;
-        for (vector<ofxUIWidget*>::iterator it = ws.begin(); it < ws.end(); it++) {
-            (*it)->getRect()->setY(y);
-            y += _h;
-        }
+    // returns the bounds of the area that is not obscured behind the scroll bar
+    ofRectangle getAvailableSpace()  {
+        return ofRectangle(rect->x, rect->y, rect->width - scrollbar_w, rect->height);
     }
     
+    void draw() {
+        ofxUIScrollableCanvas::draw();
+        for(list<ofxUIWidget*>::iterator it = listItems.begin(); it != listItems.end(); ++it)
+        {
+            if((*it)->isVisible() && (*it)->getRect()->rInside(*sRect))
+            {
+                ofxUIWidget * w = (*it);
+                w->draw();
+                if (w->hasLabel()) {
+                    ((ofxUIWidgetWithLabel*)w)->getLabelWidget()->draw();
+                }
+            }
+		}
+        scrollbar->draw();
+    }
+
     // optionally use an image as the scrollbar
     void setScrollbarImage(string imagePath) {
         scrollbar->setImage(imagePath);
@@ -122,11 +167,13 @@ public:
 protected:
     //TODO I think I can use sRect dimensions instead of init_*
     float init_x, init_y, init_w, init_h;
+    float listPadding;
     float scrollbar_w, scrollbar_h;
     float contentHeight;
     float scrollTop, scrollBottom;
     ofxUIDraggableRect * scrollbar;
     ofRectangle * scrollbarTrack;
+    std::list<ofxUIWidget*> listItems;
 };
 
 
