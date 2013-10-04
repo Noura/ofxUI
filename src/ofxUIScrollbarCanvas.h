@@ -66,11 +66,11 @@ public:
     }
     
     // This will re-flow the content to fill gaps left by removed widgets
-    void reflowWidgets(vector<ofxUIWidget*> ws, float h, float y0) {
+    void reflowWidgets(vector<ofxUIWidget*> ws, float _h, float y0) {
         float y = y0;
         for (vector<ofxUIWidget*>::iterator it = ws.begin(); it < ws.end(); it++) {
             (*it)->getRect()->setY(y);
-            y += h;
+            y += _h;
         }
     }
     
