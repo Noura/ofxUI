@@ -250,8 +250,10 @@ public:
     
     void mousePressed(int x, int y, int button) 
     {
-        if(rect->inside(x, y)) focus();
-        else unfocus();
+        if(rect->inside(x, y))
+            focus();
+        else
+            unfocus();
     }
     
     void focus() {
