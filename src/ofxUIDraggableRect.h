@@ -7,8 +7,8 @@
  *      Author: noura
  */
 
-#ifndef example_all_ofxUIDraggableRect_h
-#define example_all_ofxUIDraggableRect_h
+#ifndef OFXUI_DRAGGABLE_RECT
+#define OFXUI_DRAGGABLE_RECT
 
 #include "ofxUIRectangle.h"
 #include "ofMain.h"
