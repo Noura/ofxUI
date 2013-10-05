@@ -35,7 +35,7 @@ public:
     , init_y(_y)
     , init_w(_w)
     , init_h(_h)
-    , listPadding(10.0) {
+    , listPadding(5.0) {
         scrollbar_w = OFX_UI_MIN_SCROLLBAR_W;
         scrollbar_h = OFX_UI_MIN_SCROLLBAR_H;
         kind = OFX_UI_WIDGET_SCROLLBARCANVAS;
@@ -56,16 +56,18 @@ public:
     
     ofxUIWidget* addWidgetToList(ofxUIWidget * widget) {
         listItems.push_back(widget);
+        if (widget->hasLabel()) {
+            setLabelFont(((ofxUIWidgetWithLabel*)widget)->getLabelWidget());
+        }
+        widget->setParent(this);
+		widget->setRectParent(this->rect);
         reflowWidgets();
     }
     
-    void removeWidgetFromList(ofxUIWidget * widget) {
-        for (list<ofxUIWidget*>::iterator it = listItems.begin(); it != listItems.end(); it++) {
-            if ((*it) == widget) {
-                listItems.erase(it);
-                delete widget;
-            }
-        }
+    void removeWidgetFromList(list<ofxUIWidget*>::iterator it) {
+        delete (*it);
+        listItems.erase(it);
+        reflowWidgets();
     }
     
     list<ofxUIWidget*> getWidgetList() {
@@ -78,9 +80,6 @@ public:
             ofxUIWidget *w = (*it);
             w->getRect()->y = y;
             float h = MAX(w->getRect()->height, w->getPaddingRect()->height);
-            if (w->hasLabel()) {
-                ((ofxUIWidgetWithLabel*)w)->getLabelWidget()->getRect()->y = y;
-            }
             y += h + listPadding;
         }
         setContentHeight(y - init_y);
@@ -104,7 +103,29 @@ public:
     }
     
     void draw() {
-        ofxUIScrollableCanvas::draw();
+        
+        ofxUIPushStyle();
+        
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_LIGHTING);
+        ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+        ofxUISetRectMode(OFX_UI_RECTMODE_CORNER);
+        ofSetLineWidth(1.0);
+        
+        drawPadded();
+        
+        drawPaddedOutline();
+        
+        drawBack();
+        
+        drawFill();
+        
+        drawFillHighlight();
+        
+        drawOutline();
+        
+        drawOutlineHighlight();
+        
         for(list<ofxUIWidget*>::iterator it = listItems.begin(); it != listItems.end(); ++it)
         {
             if((*it)->isVisible() && (*it)->getRect()->rInside(*sRect))
@@ -114,9 +135,12 @@ public:
                 if (w->hasLabel()) {
                     ((ofxUIWidgetWithLabel*)w)->getLabelWidget()->draw();
                 }
+                //TODO handle embedded widgets
             }
 		}
         scrollbar->draw();
+        
+        ofxUIPopStyle();
     }
 
     // optionally use an image as the scrollbar
