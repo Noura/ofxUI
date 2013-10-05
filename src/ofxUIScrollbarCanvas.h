@@ -16,8 +16,8 @@
  *      Author: noura
  */
 
-#ifndef example_all_ofxUIScrollbarCanvas_h
-#define example_all_ofxUIScrollbarCanvas_h
+#ifndef OFXUI_SCROLLBAR_CANVAS
+#define OFXUI_SCROLLBAR_CANVAS
 
 #define OFX_UI_MIN_SCROLLBAR_H 25
 #define OFX_UI_MIN_SCROLLBAR_W 15
@@ -187,6 +187,14 @@ public:
         rect->y = init_y - (contentHeight - init_h);
         scrollbar->y = init_y + (init_h - scrollbar->height);
     }
+
+    // This method assumes that the sort function you give it will work for every pair comparison of all widgets in listItems.
+    void sortWidgets(bool (*f)(const ofxUIWidget *, const ofxUIWidget *)) {
+        // std::sort(listItems.begin(), listItems.end(), f);
+        listItems.sort(f);
+        reflowWidgets();
+    }
+    
     
 protected:
     //TODO I think I can use sRect dimensions instead of init_*
