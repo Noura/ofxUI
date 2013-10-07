@@ -70,13 +70,14 @@ public:
     
     void removeWidgetFromList(list<ofxUIWidget*>::iterator it, bool reflow = true) {
         // If you know you are going to be calling removeWidgetFromList many times in a row, you might opt to pass in reflow = false and then call reflowWidgets() at the end for efficiency
-        delete (*it);
+        ofxUIWidget * w = *it;
         listItems.erase(it);
+        delete w;
         if (reflow) reflowWidgets();
     }
     
-    list<ofxUIWidget*> getWidgetList() {
-        return listItems;
+    list<ofxUIWidget*> * getWidgetList() {
+        return &listItems;
     }
     
     void reflowWidgets() {
