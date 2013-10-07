@@ -42,7 +42,6 @@ public:
         paddedRect->setParent(rect);
 		name = string(_name); 
 		kind = OFX_UI_WIDGET_TEXTAREA;
-		textstring = _textstring;
         setDrawFill(true);
         setDrawBack(false);
         drawShadow = false; 
@@ -53,12 +52,11 @@ public:
         label->setEmbedded(true);
         
         autoSize = (h == 0);
-        if (autoSize) {
-            setHeightForContent();
-        }
         
         lineHeight = label->getLineHeight() * 1.5;
         lineSpaceSize = lineHeight * 0.5;
+        
+        setTextString(_textstring);
     }
     
     virtual void drawBack()
@@ -177,12 +175,12 @@ public:
         
         if (autoSize) {
             setHeightForContent();
-            paddedRect->setHeight(rect->getHeight() + 2.0*padding);
         }
     }
 
     void setHeightForContent() {
         rect->setHeight(textLines.size() * (lineHeight + lineSpaceSize));
+        paddedRect->setHeight(rect->getHeight() + 2.0*padding);
     }
     
 	void setParent(ofxUIWidget *_parent)

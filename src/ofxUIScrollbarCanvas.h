@@ -56,7 +56,8 @@ public:
     
     ofxUIWidget* addWidgetToList(ofxUIWidget * widget) {
         listItems.push_back(widget);
-        if (widget->hasLabel()) {
+        if (widget->hasLabel() &&
+            widget->getKind() != OFX_UI_WIDGET_TEXTAREA) {
             setLabelFont(((ofxUIWidgetWithLabel*)widget)->getLabelWidget());
         }
         widget->setParent(this);
@@ -82,7 +83,7 @@ public:
             float h = MAX(w->getRect()->height, w->getPaddingRect()->height);
             y += h + listPadding;
         }
-        setContentHeight(y - init_y);
+        setContentHeight(y - init_y + 50); // TODO why this magic number??
     }
     
     void setContentHeight(float _contentHeight) {
@@ -132,7 +133,8 @@ public:
             {
                 ofxUIWidget * w = (*it);
                 w->draw();
-                if (w->hasLabel()) {
+                if (w->hasLabel() &&
+                    w->getKind() != OFX_UI_WIDGET_TEXTAREA) {
                     ((ofxUIWidgetWithLabel*)w)->getLabelWidget()->draw();
                 }
                 //TODO handle embedded widgets
