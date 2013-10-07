@@ -29,6 +29,8 @@ class ofxUIScrollbarCanvas : public ofxUIScrollableCanvas {
 
 public:
     
+    //TODO when the content starts out really short and is growing taller, the scrollbar grows taller with the content. this seems weird.
+    
     ofxUIScrollbarCanvas(float _x, float _y, float _w, float _h)
     : ofxUIScrollableCanvas(_x, _y, _w, _h)
     , init_x(_x)
@@ -54,7 +56,8 @@ public:
         }
     }
     
-    ofxUIWidget* addWidgetToList(ofxUIWidget * widget) {
+    ofxUIWidget* addWidgetToList(ofxUIWidget * widget, bool reflow = true) {
+        // If you know you are going to be calling addWidgetToList many times in a row, you might opt to pass in reflow = false and then call reflowWidgets() at the end for efficiency
         listItems.push_back(widget);
         if (widget->hasLabel() &&
             widget->getKind() != OFX_UI_WIDGET_TEXTAREA) {
@@ -62,13 +65,14 @@ public:
         }
         widget->setParent(this);
 		widget->setRectParent(this->rect);
-        reflowWidgets();
+        if (reflow) reflowWidgets();
     }
     
-    void removeWidgetFromList(list<ofxUIWidget*>::iterator it) {
+    void removeWidgetFromList(list<ofxUIWidget*>::iterator it, bool reflow = true) {
+        // If you know you are going to be calling removeWidgetFromList many times in a row, you might opt to pass in reflow = false and then call reflowWidgets() at the end for efficiency
         delete (*it);
         listItems.erase(it);
-        reflowWidgets();
+        if (reflow) reflowWidgets();
     }
     
     list<ofxUIWidget*> getWidgetList() {
