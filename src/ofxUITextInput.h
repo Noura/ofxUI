@@ -70,6 +70,7 @@ public:
 
 		defaultstring = _textstring;;
         textArea = new ofxUITextArea(_name, _textstring, rect->width, rect->height, rect->x, rect->y, _size);
+        textArea->setParent(this);
         
 		clicked = false;
         autoclear = true;
@@ -85,7 +86,10 @@ public:
         cursorLine = 0;
         
         shiftKeyPressed = false;
-
+        
+        // TODO fix things so I don't need this hack
+        xCorrection = 0;
+        yCorrection = 0;
     }
     
     /* CURSOR ARITHMETIC ******************************************************/
@@ -180,7 +184,7 @@ public:
         ofxUIFill();
         ofxUISetColor(textArea->getLabelWidget()->getColorFillHighlight(), 255.0*fabs(cos(theta)));
         theta +=0.05;
-        ofxUIDrawRect(x, y, cursorWidth, textArea->lineHeight);
+        ofxUIDrawRect(x + xCorrection, y + yCorrection, cursorWidth, textArea->lineHeight);
     }
     
     
@@ -216,7 +220,7 @@ public:
 		{
 			ofxUIFill(); 
             ofxUISetColor(color_fill);
-            textArea->getLabelWidget()->drawString(textArea->getRect()->getX(), textArea->getLineBottomY(0), defaultstring);
+            textArea->getLabelWidget()->drawString(rect->x + textArea->xCorrection + 2.0, yCorrection + textArea->getLineBottomY(0), defaultstring);
 		}
     }
 
@@ -554,6 +558,8 @@ public:
     }
     
     ofEvent<string> inputSubmitted;
+    
+    float xCorrection, yCorrection;
     
 protected:
     // text

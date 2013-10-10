@@ -46,7 +46,7 @@ public:
         setDrawBack(false);
         drawShadow = false; 
         		
-		label = new ofxUILabel(x+padding,y+padding,(name+" LABEL"), _size);
+		label = new ofxUILabel(x+padding,y+padding, name, _size);
 		label->setParent(label);
 		label->setRectParent(rect);
         label->setEmbedded(true);
@@ -57,6 +57,10 @@ public:
         lineSpaceSize = lineHeight * 0.5;
         
         setTextString(_textstring);
+        
+        // TODO fix things so I don't need this hack
+        xCorrection = 0;
+        yCorrection = 0;
     }
     
     virtual void drawBack()
@@ -71,7 +75,6 @@ public:
     
     virtual void drawFill()
     {
-        
         if(draw_fill)
         {
             if(drawShadow)
@@ -79,14 +82,14 @@ public:
                 ofSetColor(color_back);
                 for(unsigned int i = 0; i < textLines.size(); i++)
                 {
-                    label->drawStringShadow(rect->getX(), getLineBottomY(i), textLines[i]);
+                    label->drawStringShadow(xCorrection + rect->getX(), yCorrection + getLineBottomY(i), textLines[i]);
                 }
             }
             
             ofSetColor(color_fill);
             for(unsigned int i = 0; i < textLines.size(); i++)
             {
-                label->drawString(rect->getX(), getLineBottomY(i), textLines[i]);
+                label->drawString(xCorrection + rect->getX(), yCorrection + getLineBottomY(i), textLines[i]);
             }
         }
     }
@@ -200,7 +203,9 @@ public:
     bool drawShadow; 
     int lineSpaceSize;
     int lineHeight; 
-    int offsetY; 
+    int offsetY;
+    
+    float xCorrection, yCorrection;
 };
 
 #endif
