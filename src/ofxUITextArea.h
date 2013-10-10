@@ -46,7 +46,7 @@ public:
         setDrawBack(false);
         drawShadow = false; 
         		
-		label = new ofxUILabel(x+padding,y+padding,(name+" LABEL"), _size);
+		label = new ofxUILabel(x+padding,y+padding,name, _size);
 		label->setParent(label);
 		label->setRectParent(rect);
         label->setEmbedded(true);
