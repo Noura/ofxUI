@@ -45,7 +45,7 @@ public:
         setDrawFill(true);
         setDrawBack(false);
         drawShadow = false; 
-        		
+
 		label = new ofxUILabel(x+padding,y+padding, name, _size);
 		label->setParent(label);
 		label->setRectParent(rect);

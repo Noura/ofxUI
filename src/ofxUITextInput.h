@@ -25,6 +25,8 @@
 #ifndef OFXUI_TEXT_INPUT
 #define OFXUI_TEXT_INPUT
 
+// TODO make it work even when you don't give it the x and y initially
+
 // TODO better way to do this; I think this is mac-only
 #define OFXUI_KEY_BACK_QUOTE 161
 

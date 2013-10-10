@@ -25,6 +25,8 @@
 #include "ofMain.h"
 #include "ofxUI.h"
 
+// TODO fix the bug where if the content is so short it does not need to scroll, sometimes the scrollbar does not make itself the right size and so scrolling appears "backwards" because as you drag the scrollbar the content "sticks" to the scrollbar
+
 class ofxUIScrollbarCanvas : public ofxUIScrollableCanvas {
 
 public:
