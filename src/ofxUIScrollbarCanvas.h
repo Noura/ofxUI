@@ -90,7 +90,7 @@ public:
             float h = MAX(w->getRect()->height, w->getPaddingRect()->height);
             y += h + listPadding;
         }
-        setContentHeight(y - init_y + 50); // TODO why this magic number??
+        setContentHeight(y); // TODO why this magic number??
     }
     
     void setContentHeight(float _contentHeight) {
