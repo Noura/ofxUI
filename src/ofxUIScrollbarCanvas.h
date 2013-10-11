@@ -83,7 +83,7 @@ public:
     }
     
     void reflowWidgets() {
-        float y = init_y + listPadding;
+        float y = listPadding;
         for (list<ofxUIWidget*>::iterator it = listItems.begin(); it != listItems.end(); it++) {
             ofxUIWidget *w = (*it);
             w->getRect()->y = y;
