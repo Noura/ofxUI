@@ -95,7 +95,11 @@ public:
     
     void setContentHeight(float _contentHeight) {
         contentHeight = _contentHeight;
-        scrollbar_h = CLAMP(init_h * init_h / contentHeight, OFX_UI_MIN_SCROLLBAR_H, contentHeight);
+        if (_contentHeight <= init_h) {
+            scrollbar_h = init_h;
+        } else {
+            scrollbar_h = CLAMP(init_h * init_h / contentHeight, OFX_UI_MIN_SCROLLBAR_H, contentHeight);
+        }
         scrollbar->setHeight(scrollbar_h);
         scrollTop = init_y + scrollbar->height/2;
         scrollBottom = init_y + init_h - scrollbar->height/2;
