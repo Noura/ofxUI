@@ -30,13 +30,14 @@
 class ofxUITextArea : public ofxUIWidgetWithLabel
 {
 public:
-    ofxUITextArea(string _name, string _textstring, float w, float h = 0, float x = 0, float y = 0, int _size = OFX_UI_FONT_MEDIUM_SIZE) : ofxUIWidgetWithLabel()
+    ofxUITextArea(string _name, string _textstring, float w, float h = 0, float x = 0, float y = 0, int _size = OFX_UI_FONT_MEDIUM_SIZE, bool _password = false) : ofxUIWidgetWithLabel()
     {
-        init(_name, _textstring, w, h, x, y, _size);
+        init(_name, _textstring, w, h, x, y, _size, _password);
     }
     
-    void init(string _name, string _textstring, float w, float h, float x, float y, int _size)
+    void init(string _name, string _textstring, float w, float h, float x, float y, int _size, bool _password)
     {
+        password = _password;
         paddedRect = new ofxUIRectangle(x, y, w, h);
         rect = new ofxUIRectangle(x + padding, y + padding, w - 2.0*padding, h - 2.0*padding);
         paddedRect->setParent(rect);
@@ -73,23 +74,42 @@ public:
         }
     }
     
+    virtual string passwordString(int n) {
+        char res[n];
+        for (int i = 0; i < n; i++) {
+            res[i] = password_char;
+        }
+        std::string resString(res);
+        return resString;
+    }
+    
     virtual void drawFill()
     {
         if(draw_fill)
         {
+            vector<string> * displayStringsPtr;
+            vector<string> displayStrings;
+            if (password) {
+                for (int i = 0; i < textLines.size(); i++) {
+                    displayStrings.push_back(passwordString(textLines[i].size()));
+                    displayStringsPtr = &displayStrings;
+                }
+            } else {
+                displayStringsPtr = &textLines;
+            }
             if(drawShadow)
             {
                 ofSetColor(color_back);
                 for(unsigned int i = 0; i < textLines.size(); i++)
                 {
-                    label->drawStringShadow(xCorrection + rect->getX(), yCorrection + getLineBottomY(i), textLines[i]);
+                    label->drawStringShadow(xCorrection + rect->getX(), yCorrection + getLineBottomY(i), (*displayStringsPtr)[i]);
                 }
             }
             
             ofSetColor(color_fill);
             for(unsigned int i = 0; i < textLines.size(); i++)
             {
-                label->drawString(xCorrection + rect->getX(), yCorrection + getLineBottomY(i), textLines[i]);
+                label->drawString(xCorrection + rect->getX(), yCorrection + getLineBottomY(i), (*displayStringsPtr)[i]);
             }
         }
     }
@@ -202,8 +222,10 @@ public:
     bool autoSize;
     bool drawShadow; 
     int lineSpaceSize;
-    int lineHeight; 
-    int offsetY;
+    int lineHeight;
+    
+    bool password;
+    char password_char = '*';
     
     float xCorrection, yCorrection;
 };

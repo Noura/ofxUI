@@ -173,8 +173,13 @@ public:
 
         string beforeCursor = "";
         if (textArea->textLines.size() > 0) {
-            beforeCursor = textArea->textLines[cursorLine].substr(0, cursorChar);
+            if (textArea->password) {
+                beforeCursor = textArea->passwordString(cursorChar);
+            } else {
+                beforeCursor = textArea->textLines[cursorLine].substr(0, cursorChar);
+            }
         }
+
         // we need to put "." on both ends of the string so that the width of
         // white space at the beginning or end of the string is included
         float xOffset = label->getStringWidth("." + beforeCursor + ".") - label->getStringWidth("..");
@@ -557,6 +562,14 @@ public:
     void setTriggerOnClick(bool _triggerOnClick)
     {
         triggerOnClick = _triggerOnClick;
+    }
+    
+    bool isPassword() {
+        return textArea->password;
+    }
+    
+    void isPassword(bool val) {
+        textArea->password = val;
     }
     
     ofEvent<string> inputSubmitted;
