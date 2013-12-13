@@ -93,6 +93,13 @@ public:
     
     void init(int w, int h, ofxUICanvas *sharedResources = NULL)
     {
+        font_large = NULL;
+        font_medium = NULL;
+        font_small = NULL;
+        GUIevent = NULL;
+        lastAdded = NULL;
+        activeFocusedWidget = NULL;
+        
         name = string("OFX_UI_WIDGET_CANVAS");
 		kind = OFX_UI_WIDGET_CANVAS; 
 		
@@ -127,8 +134,7 @@ public:
             setFont(fontName,true, true, false, 0.0, OFX_UI_FONT_RESOLUTION);
         }
         
-		font = font_medium; 
-		lastAdded = NULL; 
+		font = font_medium;
         uniqueIDs = 0;         
         widgetSpacing = OFX_UI_GLOBAL_WIDGET_SPACING;
         globalCanvasWidth = OFX_UI_GLOBAL_CANVAS_WIDTH;
