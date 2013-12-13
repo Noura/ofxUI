@@ -39,7 +39,9 @@ public:
     , init_y(_y)
     , init_w(_w)
     , init_h(_h)
-    , listPadding(5.0) {
+    , listPadding(5.0)
+    , scrollbar(NULL)
+    , scrollbarTrack(NULL) {
         scrollbar_w = OFX_UI_MIN_SCROLLBAR_W;
         scrollbar_h = OFX_UI_MIN_SCROLLBAR_H;
         kind = OFX_UI_WIDGET_SCROLLBARCANVAS;
