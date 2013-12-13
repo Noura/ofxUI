@@ -32,7 +32,8 @@ class ofxUILabel;
 class ofxUIWidgetWithLabel : public ofxUIWidget           
 {
 public:
-    ofxUIWidgetWithLabel() : ofxUIWidget() 
+    ofxUIWidgetWithLabel() : ofxUIWidget()
+    , label(NULL)
     {        
  
     }

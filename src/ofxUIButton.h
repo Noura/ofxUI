@@ -89,6 +89,7 @@ public:
     virtual void init(string _name, bool *_value, float w, float h, float x = 0, float y = 0, int _size = OFX_UI_FONT_SMALL)
     //init(string _name, bool _value, float w, float h, float x = 0, float y = 0, int _size = OFX_UI_FONT_MEDIUM)    
     {
+        value = NULL;
         rect = new ofxUIRectangle(x,y,w,h); 
 		name = string(_name);  		
 		kind = OFX_UI_WIDGET_BUTTON; 		
