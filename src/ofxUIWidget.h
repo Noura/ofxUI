@@ -28,10 +28,12 @@
 class ofxUIWidget           
 {
 public:
-    ofxUIWidget() 
+    ofxUIWidget()
+    : parent(NULL)
+    , rect(NULL)
+    , paddedRect(NULL)
+    , font(NULL)
     {
-        
-        parent = NULL; 
         name = string("base");
         ID = -1;
         hit = false; 
